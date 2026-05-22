@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach's Arena - Player Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#313030",
+                    "tertiary-fixed-dim": "#98cbff",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "primary-fixed-dim": "#ffb68f",
+                    "tertiary": "#98cbff",
+                    "on-error": "#690005",
+                    "surface-container": "#20201f",
+                    "on-primary": "#542100",
+                    "on-background": "#e5e2e1",
+                    "surface": "#131313",
+                    "on-surface": "#e5e2e1",
+                    "tertiary-container": "#1297e9",
+                    "surface-dim": "#131313",
+                    "on-primary-fixed-variant": "#773200",
+                    "surface-container-lowest": "#0e0e0e",
+                    "surface-bright": "#393939",
+                    "on-tertiary": "#003354",
+                    "surface-tint": "#ffb68f",
+                    "error": "#ffb4ab",
+                    "tertiary-fixed": "#cee5ff",
+                    "surface-container-high": "#2a2a2a",
+                    "on-secondary-container": "#b4b5b5",
+                    "on-error-container": "#ffdad6",
+                    "outline-variant": "#574237",
+                    "surface-container-highest": "#353535",
+                    "background": "#131313",
+                    "primary-fixed": "#ffdbca",
+                    "primary": "#ffb68f",
+                    "on-primary-container": "#491c00",
+                    "secondary-fixed": "#e2e2e2",
+                    "inverse-primary": "#9c4400",
+                    "on-tertiary-fixed": "#001d33",
+                    "secondary-container": "#454747",
+                    "secondary": "#c6c6c7",
+                    "primary-container": "#e56f1e",
+                    "outline": "#a68b7e",
+                    "on-tertiary-container": "#002c49",
+                    "on-surface-variant": "#dec0b2",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "on-secondary": "#2f3131",
+                    "inverse-surface": "#e5e2e1",
+                    "on-secondary-fixed-variant": "#454747",
+                    "error-container": "#93000a",
+                    "surface-variant": "#353535",
+                    "on-primary-fixed": "#331200",
+                    "on-tertiary-fixed-variant": "#004a77",
+                    "surface-container-low": "#1c1b1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-gap-md": "16px",
+                    "stack-gap-sm": "8px",
+                    "gutter": "16px",
+                    "container-padding": "20px",
+                    "stack-gap-lg": "24px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Sora"],
+                    "label-md": ["Geist"],
+                    "headline-lg-mobile": ["Sora"],
+                    "body-md": ["Geist"],
+                    "body-lg": ["Geist"],
+                    "headline-md": ["Sora"],
+                    "label-sm": ["Geist"],
+                    "headline-xl": ["Sora"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom scrollbar for horizontal tabs */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen font-body-md pb-24">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky border-b border-surface-variant bg-background dark:bg-background z-50">
+<div class="flex items-center justify-between px-container-padding h-16 w-full z-50">
+<button class="text-primary dark:text-primary hover:opacity-80 active:scale-95 transition-transform flex items-center justify-center h-12 w-12 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary">Player Profile</h1>
+<button class="text-primary dark:text-primary hover:opacity-80 active:scale-95 transition-transform flex items-center justify-center h-12 w-12 rounded-full">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<main class="w-full max-w-4xl mx-auto px-container-padding pt-stack-gap-md pb-stack-gap-lg flex flex-col gap-stack-gap-lg">
+<!-- Player Header -->
+<section class="flex flex-col md:flex-row gap-stack-gap-md items-center md:items-start bg-surface-container rounded-xl p-stack-gap-md border border-surface-variant">
+<div class="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-2 border-primary shrink-0">
+<img alt="Player Photo" class="w-full h-full object-cover" data-alt="A striking portrait of a young basketball player intensely focused, photographed against a stark black background with dramatic safety-orange rim lighting highlighting his profile. The aesthetic is high-contrast dark mode, echoing a premium digital playbook. He wears a black jersey with subtle texture. The mood is authoritative and energetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6MuG1-fCEk7IH6HRTUIZkkH7R5MGnHKUB7BhKgdds4GZ1pqlFqVf_vZ6jJ9qMtPrlcORNpWwKg4rhJjDfQlchoCj-2uxx6RQy6QNMxyvswd8w4j9kq_GXXGnqy5tNYRn9YdrzoY0aHX8zorJjTkiT6Hjuj3iwqMp_GoFSk-E9E2gka3CUUzEsQW0yVKpukub62qDIx-Ov7nW6F-d64GorAyx2xVqWQy0DUq1EcWcx8DOqb5XuyoL6mVjzpzWPsfPy8k6BdYBKdjED"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+</div>
+<div class="flex flex-col items-center md:items-start text-center md:text-left flex-grow">
+<div class="flex items-center gap-stack-gap-sm mb-unit">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">Marcus Johnson</h2>
+<span class="bg-primary text-on-primary font-label-sm text-label-sm px-2 py-1 rounded-full uppercase tracking-wider font-bold">PG</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-stack-gap-sm">Class of 2025 • Elite Academy</p>
+<div class="flex gap-stack-gap-md mt-auto w-full max-w-md bg-surface-container-high p-stack-gap-sm rounded-lg border border-surface-variant">
+<div class="flex-1 flex flex-col items-center justify-center border-r border-surface-variant">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase">Height</span>
+<span class="font-headline-md text-headline-md text-on-background">6'3"</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center border-r border-surface-variant">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase">Weight</span>
+<span class="font-headline-md text-headline-md text-on-background">185</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase">Status</span>
+<span class="bg-green-500 text-white font-label-sm text-label-sm px-2 py-0.5 rounded-full mt-1">PAID</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Horizontal Tab Bar -->
+<div class="w-full overflow-x-auto no-scrollbar border-b border-surface-variant">
+<div class="flex gap-stack-gap-lg min-w-max pb-2 px-unit">
+<button class="relative font-label-md text-label-md text-primary pb-2">
+                    Nutrition Plan
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-t-full"></div>
+</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-2">Workout Plan</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-2">Sessions Log</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-2">Progress</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-2">Skill Ratings</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-2">Payments</button>
+</div>
+</div>
+<!-- Tab Content: Nutrition Plan (Active) -->
+<section class="flex flex-col gap-stack-gap-md animate-fade-in">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md text-on-background">Daily Targets</h3>
+<button class="flex items-center gap-unit text-primary font-label-md text-label-md hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">edit</span> Edit
+                </button>
+</div>
+<!-- Bento Grid for Macros -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-stack-gap-md">
+<!-- Calories Card -->
+<div class="col-span-2 md:col-span-1 bg-surface-container rounded-xl p-stack-gap-md border border-surface-variant flex flex-col justify-center items-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-primary text-4xl mb-unit">local_fire_department</span>
+<span class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">3,200</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Calories</span>
+</div>
+<!-- Protein Card -->
+<div class="bg-surface-container rounded-xl p-stack-gap-md border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start w-full">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Protein</span>
+<span class="material-symbols-outlined text-tertiary text-xl">fitness_center</span>
+</div>
+<div class="mt-stack-gap-md">
+<div class="flex items-baseline gap-unit">
+<span class="font-headline-md text-headline-md text-on-background">210</span>
+<span class="text-on-surface-variant font-body-md text-body-md">g</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full mt-2">
+<div class="bg-tertiary h-1.5 rounded-full w-[80%]"></div>
+</div>
+</div>
+</div>
+<!-- Carbs Card -->
+<div class="bg-surface-container rounded-xl p-stack-gap-md border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start w-full">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Carbs</span>
+<span class="material-symbols-outlined text-primary text-xl">grain</span>
+</div>
+<div class="mt-stack-gap-md">
+<div class="flex items-baseline gap-unit">
+<span class="font-headline-md text-headline-md text-on-background">350</span>
+<span class="text-on-surface-variant font-body-md text-body-md">g</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full mt-2">
+<div class="bg-primary h-1.5 rounded-full w-[65%]"></div>
+</div>
+</div>
+</div>
+<!-- Fats Card -->
+<div class="bg-surface-container rounded-xl p-stack-gap-md border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start w-full">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Fats</span>
+<span class="material-symbols-outlined text-secondary text-xl">water_drop</span>
+</div>
+<div class="mt-stack-gap-md">
+<div class="flex items-baseline gap-unit">
+<span class="font-headline-md text-headline-md text-on-background">90</span>
+<span class="text-on-surface-variant font-body-md text-body-md">g</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full mt-2">
+<div class="bg-secondary h-1.5 rounded-full w-[45%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Meal Schedule List -->
+<div class="mt-stack-gap-md">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-stack-gap-sm uppercase tracking-wider">Game Day Schedule</h4>
+<div class="flex flex-col gap-unit">
+<div class="flex items-center gap-stack-gap-md p-stack-gap-sm bg-[#1A1A1A] border border-[#333333] rounded-lg">
+<div class="bg-surface-container-high h-10 w-10 rounded flex items-center justify-center text-primary font-label-sm text-label-sm">8AM</div>
+<div class="flex-grow">
+<p class="font-label-md text-label-md text-on-background">Pre-Workout Oatmeal &amp; Eggs</p>
+<p class="text-on-surface-variant font-body-md text-body-md text-sm">60g C • 30g P • 15g F</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">check_circle</span>
+</div>
+<div class="flex items-center gap-stack-gap-md p-stack-gap-sm bg-[#1A1A1A] border border-[#333333] rounded-lg">
+<div class="bg-surface-container-high h-10 w-10 rounded flex items-center justify-center text-primary font-label-sm text-label-sm">11AM</div>
+<div class="flex-grow">
+<p class="font-label-md text-label-md text-on-background">Post-Training Shake</p>
+<p class="text-on-surface-variant font-body-md text-body-md text-sm">40g C • 40g P • 5g F</p>
+</div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">circle</span>
+</div>
+<div class="flex items-center gap-stack-gap-md p-stack-gap-sm bg-[#1A1A1A] border border-[#333333] rounded-lg opacity-60">
+<div class="bg-surface-container-high h-10 w-10 rounded flex items-center justify-center text-on-surface-variant font-label-sm text-label-sm">2PM</div>
+<div class="flex-grow">
+<p class="font-label-md text-label-md text-on-background">Chicken &amp; Rice Bowl</p>
+<p class="text-on-surface-variant font-body-md text-body-md text-sm">80g C • 50g P • 20g F</p>
+</div>
+<span class="material-symbols-outlined text-surface-variant" style="font-variation-settings: 'FILL' 1;">circle</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary text-black font-label-md text-label-md py-3 rounded-lg mt-stack-gap-sm flex items-center justify-center gap-unit border-t border-white/20 active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span> Add Custom Meal
+            </button>
+</section>
+</main>
+</body></html>

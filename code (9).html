@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Active Roster - Coach's Arena</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Sora:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#313030",
+                        "tertiary-fixed-dim": "#98cbff",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "primary-fixed-dim": "#ffb68f",
+                        "tertiary": "#98cbff",
+                        "on-error": "#690005",
+                        "surface-container": "#20201f",
+                        "on-primary": "#542100",
+                        "on-background": "#e5e2e1",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "tertiary-container": "#1297e9",
+                        "surface-dim": "#131313",
+                        "on-primary-fixed-variant": "#773200",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-bright": "#393939",
+                        "on-tertiary": "#003354",
+                        "surface-tint": "#ffb68f",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#cee5ff",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-container": "#b4b5b5",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#574237",
+                        "surface-container-highest": "#353535",
+                        "background": "#131313",
+                        "primary-fixed": "#ffdbca",
+                        "primary": "#ffb68f",
+                        "on-primary-container": "#491c00",
+                        "secondary-fixed": "#e2e2e2",
+                        "inverse-primary": "#9c4400",
+                        "on-tertiary-fixed": "#001d33",
+                        "secondary-container": "#454747",
+                        "secondary": "#c6c6c7",
+                        "primary-container": "#e56f1e",
+                        "outline": "#a68b7e",
+                        "on-tertiary-container": "#002c49",
+                        "on-surface-variant": "#dec0b2",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "on-secondary": "#2f3131",
+                        "inverse-surface": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#454747",
+                        "error-container": "#93000a",
+                        "surface-variant": "#353535",
+                        "on-primary-fixed": "#331200",
+                        "on-tertiary-fixed-variant": "#004a77",
+                        "surface-container-low": "#1c1b1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-gap-md": "16px",
+                        "stack-gap-sm": "8px",
+                        "gutter": "16px",
+                        "container-padding": "20px",
+                        "stack-gap-lg": "24px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Sora"],
+                        "label-md": ["Geist"],
+                        "headline-lg-mobile": ["Sora"],
+                        "body-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-md": ["Sora"],
+                        "label-sm": ["Geist"],
+                        "headline-xl": ["Sora"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        /* Custom styles for the search input focus ring */
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 2px 0 0 theme('colors.primary');
+        }
+        
+        /* High-performance inner glow for primary buttons */
+        .btn-primary {
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-background dark:bg-background border-b border-surface-variant z-50">
+<div class="flex items-center justify-between px-container-padding h-16 w-full z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="sports_basketball" data-weight="fill" style="font-variation-settings: 'FILL' 1;">sports_basketball</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary font-headline-xl text-headline-xl uppercase tracking-tighter">Coach's Arena</h1>
+<div class="w-8"></div> <!-- Spacer for center alignment -->
+</div>
+</header>
+<main class="px-container-padding py-stack-gap-lg max-w-3xl mx-auto space-y-stack-gap-lg">
+<!-- Header & Search -->
+<div class="space-y-stack-gap-md">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-background">Active Roster</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage your current athletes and training schedules.</p>
+</div>
+<div class="relative flex items-center bg-[#262626] rounded-t-DEFAULT border-b border-outline-variant overflow-hidden">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full bg-transparent border-none font-body-md text-body-md text-on-surface pl-10 pr-4 py-3 search-input placeholder:text-on-surface-variant focus:ring-0" placeholder="Search athletes..." type="text"/>
+</div>
+</div>
+<!-- Roster Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-gap-md">
+<!-- Client Card 1 -->
+<div class="bg-[#1A1A1A] border border-[#333333] rounded-lg p-4 flex items-center gap-4 hover:border-outline-variant transition-colors group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 pointer-events-none"></div>
+<div class="relative w-16 h-16 rounded-full overflow-hidden shrink-0 border-2 border-surface-variant group-hover:border-primary transition-colors">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="A striking portrait of a young male basketball player with an intense, focused expression. The lighting is dramatic, high-contrast studio style, emphasizing his athletic features against a deep, pure black background. Warm, directional safety-orange rim lighting accents his profile, aligning perfectly with a high-performance, dark-mode athletic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJfKomzhxsPCDlcYFZFFgCxSUg7eiCdOhwmIKzks-iHjzrK8Q8BuKAaz_jDbMzRRKJjZcWryPTlQDIesngaHuIGSWZKtIG5PY5KdLbn9yeHqCOYgqjt3hT7SDUiatcqlvCKJoggko_-wb8Puv8eSBEodGLs-YXYQL4BAQG-uz0FItbtDgdHOQEDMLdP-VndKsCNQ2Ug5yHAqmvW6glkix7v8k9ZiKDEet0Mp4N0h-2PtzkJ52B_MHt2PSTj8JK9QbfNIS57dlFBlyK"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Marcus Johnson</h3>
+<span class="bg-[#22C55E] text-white px-2 py-0.5 rounded-full font-label-sm text-label-sm shrink-0">PAID</span>
+</div>
+<div class="flex flex-wrap gap-2 mb-2">
+<span class="font-label-md text-label-md text-primary">Point Guard</span>
+<span class="font-label-md text-label-md text-on-surface-variant">• 185 lbs</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="target">target</span>
+<span class="font-body-md text-body-md text-sm">Focus: Perimeter Shooting</span>
+</div>
+</div>
+</div>
+<!-- Client Card 2 -->
+<div class="bg-[#1A1A1A] border border-[#333333] rounded-lg p-4 flex items-center gap-4 hover:border-outline-variant transition-colors group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 pointer-events-none"></div>
+<div class="relative w-16 h-16 rounded-full overflow-hidden shrink-0 border-2 border-surface-variant group-hover:border-primary transition-colors">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="A bold portrait of a female basketball athlete looking confidently off-camera. Shot in a high-end, gritty gym environment with deep shadows and pure black backdrops. Subtle accents of safety-orange lighting highlight her shoulders, conveying a sense of energy, power, and readiness for a high-stakes training session." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOF-VRQ5sJvPRvIR-c3fTT-0nsD901TIbENrog8LcXGM3RmOtAI_RGMgjkuGLyQAII-zSltJpWMTBwN3TVXvo9r_m2NNnvii8mNuVQr6zS0uLWDb0rI87iRHFYCz5c91Ojjls4ilPjIOb63l7mDojV0M3M5mMuU_13DMML1AWl5jC0Ld4X9zMhKMPi0oN3JqQI8c6_3xkPHdSQTjcutbNnFxxf1o5wmt5YlvAD_EeENVF1FHWdPI_qHiDcjumLsnzZ-xUC7OiKPxJ7"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Sarah Davis</h3>
+<span class="bg-[#F59E0B] text-black px-2 py-0.5 rounded-full font-label-sm text-label-sm shrink-0">PENDING</span>
+</div>
+<div class="flex flex-wrap gap-2 mb-2">
+<span class="font-label-md text-label-md text-primary">Shooting Guard</span>
+<span class="font-label-md text-label-md text-on-surface-variant">• 160 lbs</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="shield">shield</span>
+<span class="font-body-md text-body-md text-sm">Focus: Perimeter Defense</span>
+</div>
+</div>
+</div>
+<!-- Client Card 3 -->
+<div class="bg-[#1A1A1A] border border-[#333333] rounded-lg p-4 flex items-center gap-4 hover:border-outline-variant transition-colors group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 pointer-events-none"></div>
+<div class="relative w-16 h-16 rounded-full overflow-hidden shrink-0 border-2 border-surface-variant group-hover:border-primary transition-colors">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="A tight headshot of a tall, imposing male basketball player. The image features a pure black background with stark, high-contrast rim lighting in a vibrant safety-orange tone. The mood is serious and authoritative, fitting perfectly into a dark-mode, high-performance coaching application aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzEmJ2Bj7Guq2ZNaxXCJ9aAllPimmQt1O15gZGPhzNNxHNMxWdE3uXltYs4S8TnCWOqRzUjxKJO1HE6VPBsu3_B20cEiA_9KQgH_YIqU2JEfHlRtucrME94mrtuVXNcz9I-Fgk0whNR_HpU6uXFXDxTtPIqyw_AbMmriKvTISaKhT4MPHcxCZv1dVmLNu2WArihXajvolemBsOmseXIkqg-GwdTSealg-hjBttAyHXF_7fRIvZDiI7Lqg6eVTxP2nTDyN3PkyUw0_g"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">David Chen</h3>
+<span class="bg-[#22C55E] text-white px-2 py-0.5 rounded-full font-label-sm text-label-sm shrink-0">PAID</span>
+</div>
+<div class="flex flex-wrap gap-2 mb-2">
+<span class="font-label-md text-label-md text-primary">Center</span>
+<span class="font-label-md text-label-md text-on-surface-variant">• 245 lbs</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="fitness_center">fitness_center</span>
+<span class="font-body-md text-body-md text-sm">Focus: Post Moves &amp; Strength</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-24 right-6 md:right-auto md:left-1/2 md:-translate-x-1/2 z-40">
+<button class="bg-[#E06B1A] text-black font-label-md text-label-md px-6 h-12 rounded-full flex items-center gap-2 btn-primary hover:bg-[#ffb68f] active:scale-95 transition-all shadow-lg">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+            Add New Athlete
+        </button>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-safe bg-surface/80 dark:bg-surface/80 border-t border-surface-variant z-50 backdrop-blur-xl">
+<!-- Active Tab: Clients -->
+<button class="flex flex-col items-center justify-center text-primary font-bold hover:opacity-80 active:scale-90 transition-all duration-200 w-16 h-full">
+<span class="material-symbols-outlined mb-1" data-icon="groups" data-weight="fill" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="font-label-sm text-label-sm">Clients</span>
+</button>
+<!-- Inactive Tab: Business -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 active:scale-90 transition-all duration-200 w-16 h-full">
+<span class="material-symbols-outlined mb-1" data-icon="payments">payments</span>
+<span class="font-label-sm text-label-sm">Business</span>
+</button>
+<!-- Inactive Tab: Drills -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 active:scale-90 transition-all duration-200 w-16 h-full">
+<span class="material-symbols-outlined mb-1" data-icon="exercise">exercise</span>
+<span class="font-label-sm text-label-sm">Drills</span>
+</button>
+</nav>
+<!-- Desktop SideNav (Hidden on Mobile) -->
+<nav class="hidden md:flex flex-col fixed top-16 left-0 h-[calc(100vh-64px)] w-20 bg-surface/80 border-r border-surface-variant z-40 py-6 items-center gap-8">
+<button class="flex flex-col items-center justify-center text-primary font-bold hover:opacity-80 active:scale-90 transition-all duration-200 w-16 h-16 rounded-lg bg-[#262626]">
+<span class="material-symbols-outlined mb-1 text-2xl" data-icon="groups" data-weight="fill" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="font-label-sm text-[10px]">Clients</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 active:scale-90 transition-all duration-200 w-16 h-16 rounded-lg hover:bg-[#262626]/50">
+<span class="material-symbols-outlined mb-1 text-2xl" data-icon="payments">payments</span>
+<span class="font-label-sm text-[10px]">Business</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 active:scale-90 transition-all duration-200 w-16 h-16 rounded-lg hover:bg-[#262626]/50">
+<span class="material-symbols-outlined mb-1 text-2xl" data-icon="exercise">exercise</span>
+<span class="font-label-sm text-[10px]">Drills</span>
+</button>
+</nav>
+<!-- Add margin for desktop to avoid sidenav overlap -->
+<style>
+        @media (min-width: 768px) {
+            main { margin-left: 80px; }
+            .fixed.bottom-24 { bottom: 32px; }
+        }
+    </style>
+</body></html>
