@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach's Arena</title>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#E06B1A"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Coach's Arena"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Geist:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#131313",
+        "surface-container": "#20201f",
+        "surface-container-high": "#2a2a2a",
+        "surface-container-highest": "#353535",
+        "surface-variant": "#353535",
+        "background": "#131313",
+        "on-background": "#e5e2e1",
+        "on-surface": "#e5e2e1",
+        "on-surface-variant": "#dec0b2",
+        "primary": "#E06B1A",
+        "primary-container": "#e56f1e",
+        "on-primary": "#fff",
+        "outline-variant": "#574237",
+        "error": "#ffb4ab",
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Geist', sans-serif; min-height: 100dvh; }
+  h1,h2,h3,.font-headline { font-family: 'Sora', sans-serif; }
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; min-height: 100dvh; }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: #0e0e0e; border-top: 1px solid #353535; display: flex; z-index: 100; }
+  .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: none; cursor: pointer; color: #8a7a72; font-size: 10px; font-family: 'Geist', sans-serif; transition: color 0.2s; }
+  .nav-btn.active { color: #E06B1A; }
+  .nav-btn .material-symbols-outlined { font-size: 22px; }
+  .main-content { flex: 1; overflow-y: auto; padding-bottom: 100px; }
+  .card { background: #20201f; border: 1px solid #574237; border-radius: 12px; }
+  .badge-paid { background: #E06B1A; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .badge-pending { background: #353535; color: #dec0b2; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .input-field { width: 100%; background: #20201f; border: 1px solid #574237; border-radius: 8px; color: #e5e2e1; padding: 10px 14px; font-family: 'Geist', sans-serif; font-size: 14px; outline: none; box-sizing: border-box; }
+  .input-field:focus { border-color: #E06B1A; }
+  .btn-primary { background: #E06B1A; color: #fff; border: none; border-radius: 8px; padding: 14px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; letter-spacing: 0.05em; }
+  .btn-secondary { background: #20201f; color: #e5e2e1; border: 1px solid #574237; border-radius: 8px; padding: 10px 16px; font-family: 'Geist', sans-serif; font-size: 13px; cursor: pointer; }
+  .label { font-size: 10px; color: #8a7a72; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; display: block; margin-bottom: 5px; }
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: flex-end; justify-content: center; }
+  .modal.open { display: flex; }
+  .modal-content { background: #131313; border-top: 2px solid #E06B1A; border-radius: 16px 16px 0 0; padding: 20px; width: 100%; max-width: 720px; max-height: 90vh; overflow-y: auto; position: relative; z-index: 201; }
+  .skill-bar { height: 6px; background: #353535; border-radius: 3px; overflow: hidden; }
+  .skill-fill { height: 100%; background: linear-gradient(90deg, #E06B1A, #ffb347); border-radius: 3px; }
+  .tab-btn { flex: 1; padding: 8px 4px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: 'Geist', sans-serif; font-size: 11px; color: #8a7a72; white-space: nowrap; }
+  .tab-btn.active { color: #E06B1A; border-bottom-color: #E06B1A; font-weight: 700; }
+  .client-tab { display: none; }
+  .client-tab.active { display: block; }
+  select.input-field option { background: #20201f; }
+  .macro-bar { height: 8px; background: #353535; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #E06B1A; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body class="bg-background text-on-background">
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 1: ACTIVE ROSTER
+═══════════════════════════════════════════════ -->
+<div class="screen active" id="screen-clients">
+  <header style="background:#0e0e0e; border-bottom:1px solid #353535; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="material-symbols-outlined" style="color:#E06B1A;font-size:26px;">sports_basketball</span>
+      <span class="font-headline" style="color:#E06B1A;font-size:18px;font-weight:800;letter-spacing:0.05em;">COACH'S ARENA</span>
+    </div>
+    <span class="material-symbols-outlined" style="color:#8a7a72;">notifications</span>
+  </header>
+  <div class="main-content" style="padding:20px;">
+    <h1 class="font-headline" style="font-size:26px;font-weight:800;margin-bottom:16px;">ACTIVE ROSTER</h1>
+    <div style="position:relative;margin-bottom:20px;">
+      <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#8a7a72;font-size:18px;">search</span>
+      <input class="input-field" id="search-input" placeholder="Search athletes by name or goal..." style="padding-left:38px;" oninput="renderClients()"/>
+    </div>
+    <div id="client-list"></div>
+    <button class="btn-primary" style="margin-top:16px;" onclick="openModal('modal-add-client')">
+      <span class="material-symbols-outlined" style="vertical-align:middle;font-size:18px;">add</span> ONBOARD NEW ATHLETE
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 2: CLIENT PROFILE
+═══════════════════════════════════════════════ -->
+<div class="screen" id="screen-profile">
+  <header style="background:#0e0e0e; border-bottom:1px solid #353535; padding:14px 20px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:50;">
+    <button onclick="showScreen('clients')" style="background:none;border:none;color:#E06B1A;cursor:pointer;">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <span class="font-headline" style="color:#E06B1A;font-size:16px;font-weight:800;letter-spacing:0.05em;">COACH'S ARENA</span>
+    <span class="material-symbols-outlined" style="color:#8a7a72;margin-left:auto;">notifications</span>
+  </header>
+  <div class="main-content" style="padding:20px;">
+    <!-- Profile Header -->
+    <div class="card" style="padding:20px;margin-bottom:16px;text-align:center;">
+      <div style="width:80px;height:80px;background:#20201f;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;border:2px solid #E06B1A;">
+        <span class="material-symbols-outlined" style="font-size:40px;color:#E06B1A;">person</span>
+      </div>
+      <div style="font-size:10px;color:#E06B1A;letter-spacing:0.15em;margin-bottom:6px;" id="profile-roster-id">ACTIVE · ROSTER ID: #0001</div>
+      <h2 class="font-headline" id="profile-name" style="font-size:22px;font-weight:800;margin-bottom:10px;">ATHLETE NAME</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:#131313;border-radius:8px;padding:10px;">
+          <div class="label">Position</div>
+          <div id="profile-position" style="font-weight:700;font-size:14px;">PG</div>
+        </div>
+        <div style="background:#131313;border-radius:8px;padding:10px;">
+          <div class="label">Height</div>
+          <div id="profile-height" style="font-weight:700;font-size:14px;">—</div>
+        </div>
+        <div style="background:#131313;border-radius:8px;padding:10px;">
+          <div class="label">Weight</div>
+          <div id="profile-weight" style="font-weight:700;font-size:14px;">—</div>
+        </div>
+        <div style="background:#131313;border-radius:8px;padding:10px;">
+          <div class="label">Goal</div>
+          <div id="profile-goal" style="font-weight:700;font-size:14px;color:#E06B1A;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete & Edit Buttons -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;" id="edit-delete-btns">
+      <button onclick="openEditClient()" style="flex:1;padding:10px;background:rgba(59,130,246,0.15);border:1px solid #3B82F6;border-radius:8px;color:#3B82F6;cursor:pointer;font-family:'Geist',sans-serif;font-size:13px;font-weight:700;">✏️ Edit Info</button>
+      <button onclick="deleteClient()" style="flex:1;padding:10px;background:rgba(239,68,68,0.15);border:1px solid #EF4444;border-radius:8px;color:#EF4444;cursor:pointer;font-family:'Geist',sans-serif;font-size:13px;font-weight:700;">🗑 Delete</button>
+    </div>
+
+    <!-- Profile Tabs -->
+    <div style="display:flex;overflow-x:auto;border-bottom:1px solid #353535;margin-bottom:16px;">
+      <button class="tab-btn active" onclick="switchClientTab('nutrition',this)">🥗 Nutrition</button>
+      <button class="tab-btn" onclick="switchClientTab('workout',this)">💪 Workout</button>
+      <button class="tab-btn" onclick="switchClientTab('sessions',this)">📅 Sessions</button>
+      <button class="tab-btn" onclick="switchClientTab('progress',this)">📈 Progress</button>
+      <button class="tab-btn" onclick="switchClientTab('skills',this)">⭐ Skills</button>
+      <button class="tab-btn" onclick="switchClientTab('payments',this)">💰 Payments</button>
+    </div>
+
+    <!-- Nutrition Tab -->
+    <div class="client-tab active" id="tab-nutrition">
+      <div class="card" style="padding:16px;margin-bottom:12px;">
+        <div style="font-size:12px;color:#E06B1A;font-weight:700;letter-spacing:0.08em;margin-bottom:12px;">📊 DAILY TARGETS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+          <div style="background:#131313;border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#E06B1A;" id="p-cal">—</div>
+            <div class="label" style="margin:0;">Calories</div>
+          </div>
+          <div style="background:#131313;border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#3B82F6;" id="p-protein">—</div>
+            <div class="label" style="margin:0;">Protein (g)</div>
+          </div>
+          <div style="background:#131313;border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#10B981;" id="p-carbs">—</div>
+            <div class="label" style="margin:0;">Carbs (g)</div>
+          </div>
+          <div style="background:#131313;border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#8B5CF6;" id="p-fats">—</div>
+            <div class="label" style="margin:0;">Fats (g)</div>
+          </div>
+        </div>
+      </div>
+      <button onclick="openModal('modal-edit-nutrition')" style="width:100%;padding:10px;background:rgba(16,185,129,0.15);border:1px solid #10B981;border-radius:8px;color:#10B981;cursor:pointer;font-family:'Geist',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;">✏️ Edit Nutrition Plan</button>
+      <div id="meal-plan-container"></div>
+    </div>
+
+    <!-- Workout Tab -->
+    <div class="client-tab" id="tab-workout">
+      <button onclick="openModal('modal-edit-workout')" style="width:100%;padding:10px;background:rgba(224,107,26,0.15);border:1px solid #E06B1A;border-radius:8px;color:#E06B1A;cursor:pointer;font-family:'Geist',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;">✏️ Edit Workout Plan</button>
+      <div id="workout-container"></div>
+    </div>
+
+    <!-- Sessions Tab -->
+    <div class="client-tab" id="tab-sessions">
+      <button class="btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-add-session')">+ LOG SESSION</button>
+      <div id="sessions-container"></div>
+    </div>
+
+    <!-- Progress Tab -->
+    <div class="client-tab" id="tab-progress">
+      <button class="btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-add-progress')">+ ADD PROGRESS ENTRY</button>
+      <div id="progress-container"></div>
+    </div>
+
+    <!-- Skills Tab -->
+    <div class="client-tab" id="tab-skills">
+      <button class="btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-add-skill')">+ RATE SKILLS THIS MONTH</button>
+      <div id="skills-container"></div>
+    </div>
+
+    <!-- Payments Tab -->
+    <div class="client-tab" id="tab-payments">
+      <div class="card" style="padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;">
+        <div>
+          <div class="label">Total Earned</div>
+          <div id="p-earned" style="font-size:22px;font-weight:800;color:#10B981;">₹0</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="label">Pending</div>
+          <div id="p-pending" style="font-size:22px;font-weight:800;color:#EF4444;">₹0</div>
+        </div>
+      </div>
+      <button class="btn-primary" style="margin-bottom:16px;" onclick="openModal('modal-add-payment')">+ ADD PAYMENT</button>
+      <div id="payments-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 3: BUSINESS
+═══════════════════════════════════════════════ -->
+<div class="screen" id="screen-business">
+  <header style="background:#0e0e0e; border-bottom:1px solid #353535; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="material-symbols-outlined" style="color:#E06B1A;font-size:26px;">sports_basketball</span>
+      <span class="font-headline" style="color:#E06B1A;font-size:18px;font-weight:800;letter-spacing:0.05em;">COACH'S ARENA</span>
+    </div>
+    <span class="material-symbols-outlined" style="color:#8a7a72;">notifications</span>
+  </header>
+  <div class="main-content" style="padding:20px;">
+    <h1 class="font-headline" style="font-size:26px;font-weight:800;margin-bottom:16px;">FINANCIAL OVERVIEW</h1>
+    <div class="card" style="padding:20px;margin-bottom:20px;">
+      <div style="margin-bottom:16px;">
+        <div class="label">Total Revenue</div>
+        <div id="b-total" style="font-size:32px;font-weight:800;color:#e5e2e1;">₹0</div>
+        <div style="height:4px;background:#353535;border-radius:2px;margin-top:8px;overflow:hidden;">
+          <div style="height:100%;background:#E06B1A;width:100%;border-radius:2px;"></div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div class="label">Total Paid</div>
+        <div id="b-paid" style="font-size:28px;font-weight:800;color:#10B981;">₹0</div>
+        <div style="height:4px;background:#353535;border-radius:2px;margin-top:8px;overflow:hidden;">
+          <div id="b-paid-bar" style="height:100%;background:#10B981;width:0%;border-radius:2px;transition:width 0.5s;"></div>
+        </div>
+      </div>
+      <div>
+        <div class="label">Total Pending</div>
+        <div id="b-pending" style="font-size:28px;font-weight:800;color:#EF4444;">₹0</div>
+        <div style="height:4px;background:#353535;border-radius:2px;margin-top:8px;overflow:hidden;">
+          <div id="b-pending-bar" style="height:100%;background:#EF4444;width:0%;border-radius:2px;transition:width 0.5s;"></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <h2 class="font-headline" style="font-size:16px;font-weight:700;">ROSTER STATUS</h2>
+    </div>
+    <div id="business-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 4: DRILLS
+═══════════════════════════════════════════════ -->
+<div class="screen" id="screen-drills">
+  <header style="background:#0e0e0e; border-bottom:1px solid #353535; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="material-symbols-outlined" style="color:#E06B1A;font-size:26px;">sports_basketball</span>
+      <span class="font-headline" style="color:#E06B1A;font-size:18px;font-weight:800;letter-spacing:0.05em;">COACH'S ARENA</span>
+    </div>
+    <span class="material-symbols-outlined" style="color:#8a7a72;">notifications</span>
+  </header>
+  <div class="main-content" style="padding:20px;">
+    <h1 class="font-headline" style="font-size:26px;font-weight:800;margin-bottom:4px;">DRILL LIBRARY</h1>
+    <p style="color:#8a7a72;font-size:13px;margin-bottom:16px;" id="drill-count">0 drills saved</p>
+    <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;padding-bottom:4px;">
+      <button class="btn-secondary" style="white-space:nowrap;background:#E06B1A;color:#fff;border-color:#E06B1A;" onclick="filterDrills('all',this)">All Drills</button>
+      <button class="btn-secondary" style="white-space:nowrap;" onclick="filterDrills('Dribbling',this)">Dribbling</button>
+      <button class="btn-secondary" style="white-space:nowrap;" onclick="filterDrills('Shooting',this)">Shooting</button>
+      <button class="btn-secondary" style="white-space:nowrap;" onclick="filterDrills('Defence',this)">Defence</button>
+      <button class="btn-secondary" style="white-space:nowrap;" onclick="filterDrills('Conditioning',this)">Conditioning</button>
+    </div>
+    <div id="drills-list"></div>
+    <button class="btn-primary" style="margin-top:16px;" onclick="openModal('modal-add-drill')">+ ADD NEW DRILL</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     BOTTOM NAV
+═══════════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-clients" onclick="showScreen('clients')">
+    <span class="material-symbols-outlined">groups</span>
+    <span>Clients</span>
+  </button>
+  <button class="nav-btn" id="nav-business" onclick="showScreen('business')">
+    <span class="material-symbols-outlined">payments</span>
+    <span>Business</span>
+  </button>
+  <button class="nav-btn" id="nav-drills" onclick="showScreen('drills')">
+    <span class="material-symbols-outlined">exercise</span>
+    <span>Drills</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════ -->
+
+<!-- Add Client Modal -->
+<div class="modal" id="modal-add-client">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#E06B1A;">REGISTER NEW ATHLETE</h2>
+      <button onclick="closeModal('modal-add-client')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+
+    <!-- Basic Info -->
+    <div style="font-size:11px;color:#E06B1A;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">Basic Info</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="grid-column:1/-1;"><span class="label">Full Name</span><input class="input-field" id="f-name" placeholder="e.g. Arjun Singh"/></div>
+      <div><span class="label">Age</span><input class="input-field" type="number" id="f-age" placeholder="16"/></div>
+      <div><span class="label">Gender</span><select class="input-field" id="f-gender"><option>Male</option><option>Female</option></select></div>
+      <div><span class="label">Height (cm)</span><input class="input-field" type="number" id="f-height" placeholder="172"/></div>
+      <div><span class="label">Weight (kg)</span><input class="input-field" type="number" id="f-weight" placeholder="65"/></div>
+      <div><span class="label">Waist (cm)</span><input class="input-field" type="number" id="f-waist" placeholder="80"/></div>
+      <div><span class="label">Chest (cm)</span><input class="input-field" type="number" id="f-chest" placeholder="90"/></div>
+      <div style="grid-column:1/-1;"><span class="label">Goal</span>
+        <select class="input-field" id="f-goal">
+          <option>Lose Fat</option><option>Gain Muscle</option><option>Maintain & Perform</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Diet Preference</span>
+        <select class="input-field" id="f-diet">
+          <option>Vegetarian</option><option>Non-Vegetarian</option><option>Both (Veg + Non-Veg)</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Activity Level</span>
+        <select class="input-field" id="f-activity">
+          <option>Sedentary</option><option>Lightly Active</option><option>Moderately Active</option><option>Very Active</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Position</span>
+        <select class="input-field" id="f-position">
+          <option>Point Guard</option><option>Shooting Guard</option><option>Small Forward</option><option>Power Forward</option><option>Centre</option><option>Not sure</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Fitness Assessment -->
+    <div style="font-size:11px;color:#3B82F6;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:16px 0 10px;">Fitness Assessment</div>
+    <div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:12px;margin-bottom:4px;font-size:11px;color:#6b7280;">Fill these from your Session 0 assessment. The app will auto-generate the right plan.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+      <div><span class="label">Max Push Ups</span><input class="input-field" type="number" id="f-pushups" placeholder="0"/></div>
+      <div><span class="label">Max Pull Ups</span><input class="input-field" type="number" id="f-pullups" placeholder="0"/></div>
+      <div><span class="label">Plank Hold (sec)</span><input class="input-field" type="number" id="f-plank" placeholder="0"/></div>
+      <div><span class="label">Max Squats</span><input class="input-field" type="number" id="f-squats" placeholder="0"/></div>
+      <div style="grid-column:1/-1;"><span class="label">Sprint — Half Court (sec)</span><input class="input-field" type="number" id="f-sprint" placeholder="e.g. 4.5"/></div>
+    </div>
+
+    <!-- Basketball Assessment -->
+    <div style="font-size:11px;color:#10B981;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:16px 0 10px;">Basketball Assessment</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="grid-column:1/-1;"><span class="label">Dribbling Level</span>
+        <select class="input-field" id="f-dribbling">
+          <option value="0">Cannot dribble yet</option>
+          <option value="1">Basic — right hand only</option>
+          <option value="2">Both hands, no pressure</option>
+          <option value="3">Both hands with movement</option>
+          <option value="4">Advanced — combo moves</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Shooting Level</span>
+        <select class="input-field" id="f-shooting">
+          <option value="0">No form yet</option>
+          <option value="1">Basic form, close range</option>
+          <option value="2">Decent form, mid range</option>
+          <option value="3">Good form, consistent</option>
+          <option value="4">Advanced shooter</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Overall Basketball Level</span>
+        <select class="input-field" id="f-level">
+          <option value="beginner">Complete Beginner</option>
+          <option value="basic">Knows Basics</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="grid-column:1/-1;margin-top:10px;"><span class="label">Primary Focus / Notes</span><textarea class="input-field" id="f-notes" rows="2" placeholder="e.g. Fat loss + left hand dribble"></textarea></div>
+    <button class="btn-primary" style="margin-top:16px;" onclick="addClient()">✓ REGISTER ATHLETE + GENERATE SMART PLAN</button>
+  </div>
+</div>
+
+<!-- Add Session Modal -->
+<div class="modal" id="modal-add-session">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#E06B1A;">LOG SESSION</h2>
+      <button onclick="closeModal('modal-add-session')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <span class="label">Date</span><input class="input-field" type="date" id="s-date" style="margin-bottom:10px;"/>
+    <span class="label">Attendance</span>
+    <div style="display:flex;gap:10px;margin-bottom:10px;">
+      <button id="s-att-yes" onclick="setAttendance(true)" style="flex:1;padding:10px;border-radius:8px;border:none;background:#10B981;color:#fff;cursor:pointer;font-weight:700;">✓ Attended</button>
+      <button id="s-att-no" onclick="setAttendance(false)" style="flex:1;padding:10px;border-radius:8px;border:none;background:#353535;color:#e5e2e1;cursor:pointer;font-weight:700;">✗ Missed</button>
+    </div>
+    <span class="label">Session Focus</span><input class="input-field" id="s-focus" placeholder="e.g. Ball handling + shooting" style="margin-bottom:10px;"/>
+    <span class="label">Duration (min)</span><input class="input-field" type="number" id="s-duration" value="60" style="margin-bottom:10px;"/>
+    <span class="label">Coach Notes</span><textarea class="input-field" id="s-notes" rows="3" placeholder="What improved? What to focus next?"></textarea>
+    <button class="btn-primary" style="margin-top:16px;" onclick="addSession()">✓ SAVE SESSION</button>
+  </div>
+</div>
+
+<!-- Add Progress Modal -->
+<div class="modal" id="modal-add-progress">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#E06B1A;">ADD PROGRESS ENTRY</h2>
+      <button onclick="closeModal('modal-add-progress')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="grid-column:1/-1;"><span class="label">Date</span><input class="input-field" type="date" id="pr-date"/></div>
+      <div><span class="label">Weight (kg)</span><input class="input-field" type="number" id="pr-weight" placeholder="64.5"/></div>
+      <div><span class="label">Waist (cm)</span><input class="input-field" type="number" id="pr-waist"/></div>
+      <div><span class="label">Chest (cm)</span><input class="input-field" type="number" id="pr-chest"/></div>
+      <div><span class="label">Arms (cm)</span><input class="input-field" type="number" id="pr-arms"/></div>
+      <div><span class="label">Sleep (hrs)</span><input class="input-field" type="number" id="pr-sleep" placeholder="7.5"/></div>
+      <div><span class="label">Water (litres)</span><input class="input-field" type="number" id="pr-water" placeholder="3"/></div>
+      <div style="grid-column:1/-1;"><span class="label">Coach Note</span><textarea class="input-field" id="pr-notes" rows="2" placeholder="Key observations this week"></textarea></div>
+    </div>
+    <button class="btn-primary" style="margin-top:16px;" onclick="addProgress()">✓ SAVE ENTRY</button>
+  </div>
+</div>
+
+<!-- Add Skill Modal -->
+<div class="modal" id="modal-add-skill">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#E06B1A;">MONTHLY SKILL RATING</h2>
+      <button onclick="closeModal('modal-add-skill')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <span class="label">Month / Date</span><input class="input-field" type="date" id="sk-date" style="margin-bottom:12px;"/>
+    <div id="skill-sliders"></div>
+    <button class="btn-primary" style="margin-top:16px;" onclick="addSkillRating()">✓ SAVE RATINGS</button>
+  </div>
+</div>
+
+<!-- Add Payment Modal -->
+<div class="modal" id="modal-add-payment">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#E06B1A;">ADD PAYMENT</h2>
+      <button onclick="closeModal('modal-add-payment')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <span class="label">Date</span><input class="input-field" type="date" id="pay-date" style="margin-bottom:10px;"/>
+    <span class="label">Amount (₹)</span><input class="input-field" type="number" id="pay-amount" placeholder="e.g. 6500" style="margin-bottom:10px;"/>
+    <span class="label">Type</span>
+    <select class="input-field" id="pay-type" style="margin-bottom:10px;">
+      <option>Monthly</option><option>3 Month Program</option><option>Session</option><option>Other</option>
+    </select>
+    <span class="label">Status</span>
+    <select class="input-field" id="pay-status" style="margin-bottom:10px;">
+      <option>Paid</option><option>Pending</option>
+    </select>
+    <span class="label">Notes</span><input class="input-field" id="pay-notes" placeholder="e.g. Cash payment for June"/>
+    <button class="btn-primary" style="margin-top:16px;" onclick="addPayment()">✓ SAVE PAYMENT</button>
+  </div>
+</div>
+
+<!-- Add Drill Modal -->
+<div class="modal" id="modal-add-drill">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#E06B1A;">ADD DRILL</h2>
+      <button onclick="closeModal('modal-add-drill')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <span class="label">Drill Name</span><input class="input-field" id="d-name" placeholder="e.g. Two Ball Dribbling" style="margin-bottom:10px;"/>
+    <span class="label">Category</span>
+    <select class="input-field" id="d-category" style="margin-bottom:10px;">
+      <option>Dribbling</option><option>Shooting</option><option>Passing</option><option>Defence</option><option>Conditioning</option><option>Footwork</option><option>Team</option>
+    </select>
+    <span class="label">Duration</span><input class="input-field" id="d-duration" placeholder="e.g. 10 min" style="margin-bottom:10px;"/>
+    <span class="label">Difficulty</span>
+    <select class="input-field" id="d-difficulty" style="margin-bottom:10px;">
+      <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+    </select>
+    <span class="label">Description</span><textarea class="input-field" id="d-desc" rows="3" placeholder="How to do this drill, coaching cues..."></textarea>
+    <button class="btn-primary" style="margin-top:16px;" onclick="addDrill()">✓ SAVE DRILL</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════
+const SKILLS = ["Dribbling (Right)","Dribbling (Left)","Shooting Form","Layups","Passing","Defence","Court Vision","Speed & Agility"];
+const DAY_COLORS = ["#E06B1A","#3B82F6","#8B5CF6","#10B981","#EF4444","#F59E0B","#6B7280"];
+
+let state = { clients:[], drills:[], currentClientId:null, sessionAttended:true, drillFilter:'all' };
+
+function load() {
+  try {
+    const d = localStorage.getItem('coaches_arena');
+    if(d) { const parsed = JSON.parse(d); if(parsed && parsed.clients) state = parsed; }
+  } catch(e) {
+    try {
+      const d = sessionStorage.getItem('coaches_arena');
+      if(d) { const parsed = JSON.parse(d); if(parsed && parsed.clients) state = parsed; }
+    } catch(e2) {}
+  }
+}
+function save() {
+  const data = JSON.stringify(state);
+  try { localStorage.setItem('coaches_arena', data); } catch(e) {}
+  try { sessionStorage.setItem('coaches_arena', data); } catch(e) {}
+}
+load();
+
+// ═══════════════════════════════════════
+// NUTRITION — INFS PRINCIPLES
+// ═══════════════════════════════════════
+function calcBMR(w,h,a,g) {
+  // Mifflin-St Jeor Formula (INFS recommended)
+  return g==="Male" ? Math.round(10*w+6.25*h-5*a+5) : Math.round(10*w+6.25*h-5*a-161);
+}
+function calcTDEE(bmr,act) {
+  // INFS Activity Multipliers
+  const m={Sedentary:1.2,"Lightly Active":1.375,"Moderately Active":1.55,"Very Active":1.725};
+  return Math.round(bmr*(m[act]||1.375));
+}
+function goalCal(tdee,goal) {
+  // INFS Caloric Deficit/Surplus Guidelines
+  if(goal==="Lose Fat") return tdee-400; // Moderate deficit — preserves muscle
+  if(goal==="Gain Muscle") return tdee+250; // Conservative surplus — minimizes fat gain
+  return tdee;
+}
+function buildNutrition(c) {
+  const w = +c.weight||70;
+  const bmr = calcBMR(w,+c.height||170,+c.age||16,c.gender);
+  const tdee = calcTDEE(bmr,c.activity);
+  const cal = goalCal(tdee,c.goal);
+  const isVeg = c.diet==="Vegetarian";
+  const age = +c.age||16;
+
+  // INFS Macronutrient Guidelines for Athletes
+  // Protein: 1.6-2.2g/kg for athletes (INFS Sports Nutrition)
+  const proteinMultiplier = c.goal==="Gain Muscle" ? 2.2 : c.goal==="Lose Fat" ? 2.0 : 1.8;
+  const protein = Math.round(w * proteinMultiplier);
+  const proteinCal = protein * 4;
+
+  // Fat: 0.8-1.2g/kg minimum for hormonal health (INFS)
+  const fatMultiplier = c.goal==="Lose Fat" ? 0.8 : 1.0;
+  const fats = Math.round(w * fatMultiplier);
+  const fatCal = fats * 9;
+
+  // Remaining calories from carbohydrates (INFS carb cycling concept)
+  const carbs = Math.round((cal - proteinCal - fatCal) / 4);
+
+  // Hydration: INFS recommends 35-40ml per kg body weight
+  const water = (w * 0.04).toFixed(1);
+
+  // INFS Meal Timing Principles
+  const meals = [
+    {
+      meal:"Breakfast",time:"7:00 AM",
+      cal:Math.round(cal*0.22),
+      protocol:"High protein start — INFS recommends 30-40g protein at breakfast to maximize MPS (Muscle Protein Synthesis)",
+      foods: isVeg
+        ? [`Oats ${c.goal==="Lose Fat"?"60g":"80g"} with chia seeds 1 tsp`, `Paneer bhurji 100g (protein: ~20g)`, `1 banana (fast carbs)`, `1 glass milk 250ml`]
+        : [`Oats ${c.goal==="Lose Fat"?"60g":"80g"} with chia seeds 1 tsp`, `3-4 whole eggs scrambled (protein: ~18-24g)`, `1 banana (fast carbs)`, `1 glass milk 250ml`],
+      tip: c.goal==="Lose Fat" ? "INFS: No added sugar. Oats + eggs = high satiety, keeps hunger controlled till lunch." : "INFS: Add 1 tbsp peanut butter to oats for calorie dense start."
+    },
+    {
+      meal:"Mid Morning Snack",time:"10:30 AM",
+      cal:Math.round(cal*0.10),
+      protocol:"INFS Energy Bridge — prevents energy dip, maintains anabolic environment",
+      foods: isVeg
+        ? [`Greek yogurt or thick curd 150g (protein: ~10g)`, `10-12 mixed nuts (almonds, walnuts)`, `1 seasonal fruit`]
+        : [`1-2 boiled eggs (protein: ~6-12g)`, `10-12 mixed nuts`, `1 seasonal fruit`],
+      tip:"INFS: Protein + healthy fat combo = 3-4 hrs sustained energy. No biscuits or chips."
+    },
+    {
+      meal:"Lunch",time:"1:00 PM",
+      cal:Math.round(cal*0.28),
+      protocol:"INFS Largest meal — highest carbs for afternoon energy, focus on protein + micronutrients",
+      foods: isVeg
+        ? [`2-3 roti (complex carbs)`, `Dal 1 bowl (protein: ~12g + iron)`, `Paneer 100g or soya chunks (protein: ~20g)`, `Salad with lemon (Vitamin C for iron absorption)`, `Curd 1 bowl (probiotics + calcium)`]
+        : [`2-3 roti or 1 bowl rice`, `Dal 1 bowl`, `Chicken curry 150g or fish (protein: ~30-35g)`, `Salad with lemon`, `Curd 1 bowl`],
+      tip: c.goal==="Lose Fat"?"INFS: Eat salad and dal first — increases satiety before higher calorie items.":"INFS: Post-12PM is peak insulin sensitivity — ideal time for highest carb meal."
+    },
+    {
+      meal:"Pre Training",time:`${age<=18?"5:00 PM":"5:30 PM"}`,
+      cal:Math.round(cal*0.12),
+      protocol:"INFS Pre-Workout Nutrition — carbs 60-90 min before, avoid high fat/fibre before training",
+      foods:[
+        `1-2 bananas (fast carbs, potassium for muscle contraction)`,
+        `Brown bread 1 slice with peanut butter (sustained energy)`,
+        `Water 500ml (pre-hydration — INFS recommends 5-7ml/kg pre-exercise)`
+      ],
+      tip:"INFS: Do NOT train on empty stomach. Pre-workout meal directly impacts performance intensity."
+    },
+    {
+      meal:"Post Training",time:"7:30 PM",
+      cal:Math.round(cal*0.18),
+      protocol:"INFS Anabolic Window — protein within 30-45 min post training maximises MPS",
+      foods: isVeg
+        ? [`Paneer 150g or cottage cheese (fast protein: ~30g)`, `1 banana or rice 1 bowl (glycogen replenishment)`, `Milk 1 glass with turmeric (anti-inflammatory — INFS)`, `Water 300-400ml`]
+        : [`4-5 egg whites scrambled (fast protein: ~20-25g)`, `1 banana or rice 1 bowl (glycogen replenishment)`, `Milk 1 glass with turmeric`, `Water 300-400ml`],
+      tip:"INFS Priority Meal — never skip post training nutrition. This is when muscle actually grows."
+    },
+    {
+      meal:"Dinner",time:"9:00 PM",
+      cal:Math.round(cal*0.10),
+      protocol:"INFS Evening — low carb, high protein, supports overnight recovery",
+      foods: isVeg
+        ? [`1-2 roti (lighter than lunch)`, `Sabzi 1 bowl`, `Dal or soya`, `Curd 1 bowl (casein protein — slow digesting, feeds muscles overnight)`]
+        : [`1-2 roti (lighter)`, `Sabzi 1 bowl`, `Chicken 100g or fish — grilled not fried`, `Curd 1 bowl`],
+      tip: c.goal==="Lose Fat"?"INFS: No rice at dinner. Lower carbs in evening optimises fat burning during sleep.":"INFS: Curd at dinner = casein protein = sustained amino acid release during sleep."
+    },
+  ];
+
+  return {cal, protein, carbs, fats, water, meals,
+    infsNote:`INFS Protocol: ${cal} kcal | Protein ${protein}g (${proteinMultiplier}g/kg) | Carbs ${carbs}g | Fats ${fats}g | Water ${water}L daily`
+  };
+}
+
+// ═══════════════════════════════════════
+// STRENGTH TRAINING — NSCA PRINCIPLES
+// BASKETBALL — FIBA/NBA INTERNATIONAL STANDARDS
+// ═══════════════════════════════════════
+function buildWorkout(goal, assessment) {
+  const a = assessment || {};
+  const pushups = +a.pushups || 0;
+  const pullups = +a.pullups || 0;
+  const plank = +a.plank || 0;
+  const squats = +a.squats || 0;
+  const level = a.level || 'beginner';
+  const dribbling = +a.dribbling || 0;
+  const shooting = +a.shooting || 0;
+
+  // NSCA Training Level Classification
+  // Beginner: <1yr training or <1 push up
+  // Intermediate: 6-12 months consistent
+  // Advanced: 1yr+ consistent training
+  const nsca_level = pushups < 5 ? 'beginner' : pushups < 15 ? 'intermediate' : 'advanced';
+
+  // NSCA Rep Range Guidelines by Goal
+  // Strength: 1-6 reps @ 85-100% 1RM, rest 2-5 min
+  // Hypertrophy: 6-12 reps @ 67-85% 1RM, rest 60-90 sec
+  // Muscular Endurance: 12+ reps @ <67% 1RM, rest 30 sec
+  // Power/Explosiveness: 1-5 reps @ 75-85% 1RM, rest 2-5 min
+  const nsca_reps = goal==="Gain Muscle" ? "8-12" : goal==="Lose Fat" ? "15-20" : "12-15";
+  const nsca_rest = goal==="Gain Muscle" ? "90 sec" : goal==="Lose Fat" ? "45 sec" : "60 sec";
+
+  // NSCA Push Pattern (based on assessment)
+  const pushEx = pushups === 0
+    ? [{n:"Wall Push Ups",s:"3",r:"15",note:`NSCA Regression: Standing position reduces load ~60%. Progress to incline when 15 reps easy.`},
+       {n:"Incline Push Ups (knee height)",s:"3",r:"10",note:"NSCA: Increase difficulty by lowering surface each week"}]
+    : pushups < 5
+    ? [{n:"Knee Push Ups",s:"3",r:`${pushups+3}`,note:`NSCA: Start at ${pushups+3} reps — just above current max for progressive overload`},
+       {n:"Incline Push Ups",s:"3",r:"8",note:"NSCA: Parallel progression until full push ups achieved"}]
+    : pushups < 12
+    ? [{n:"Push Ups",s:"4",r:`${pushups}`,note:`NSCA Progressive Overload: Match max then add 1 rep per session`},
+       {n:"Pike Push Ups",s:"3",r:"8",note:"NSCA: Shoulder press pattern — overhead strength"}]
+    : [{n:"Push Ups",s:"4",r:nsca_reps,note:`NSCA ${goal==="Gain Muscle"?"Hypertrophy":"Endurance"} Protocol: ${nsca_reps} reps @ ${nsca_rest} rest`},
+       {n:"Diamond Push Ups",s:"3",r:"10",note:"NSCA Tricep emphasis — close grip variation"},
+       {n:"Pike Push Ups",s:"3",r:"12",note:"NSCA Overhead push pattern"}];
+
+  // NSCA Pull Pattern
+  const pullEx = pullups === 0
+    ? [{n:"Dead Hang",s:"3",r:"20-30 sec",note:"NSCA Foundation: Grip + lat activation before pulling"},
+       {n:"Inverted Rows (table)",s:"3",r:"10",note:"NSCA: Horizontal pull — targets same muscles as pull up at 30-40% body weight"}]
+    : pullups < 4
+    ? [{n:"Eccentric Pull Ups (jump up, 5 sec lower)",s:"3",r:"5",note:"NSCA Eccentric Overload: Most effective method to build pull up strength"},
+       {n:"Inverted Rows",s:"3",r:"12",note:"NSCA Supplemental horizontal pull"}]
+    : [{n:"Pull Ups",s:"4",r:"max",note:`NSCA: ${pullups} is current max. Add 1 rep each session.`},
+       {n:"Inverted Rows",s:"3",r:"12-15",note:"NSCA: Horizontal pull for balanced back development"}];
+
+  // NSCA Core Stability
+  const coreEx = plank < 15
+    ? [{n:"Dead Bug (on back)",s:"3",r:"8 each side",note:"NSCA: Safest core exercise for beginners — no spinal compression"},
+       {n:"Knee Plank",s:"3",r:"20 sec",note:"NSCA: Build to 60 sec before progressing to full plank"}]
+    : plank < 45
+    ? [{n:"Plank",s:"3",r:`${plank+10} sec`,note:`NSCA Progressive Overload: Add 10 sec per session. Current: ${plank}s`},
+       {n:"Side Plank",s:"2",r:"20 sec each",note:"NSCA: Lateral core stability — critical for change of direction"}]
+    : [{n:"Plank",s:"3",r:"45-60 sec",note:"NSCA: Advanced — add shoulder taps when easy"},
+       {n:"Side Plank",s:"3",r:"30 sec each",note:"NSCA Lateral stability"},
+       {n:"Hollow Body Hold",s:"3",r:"30 sec",note:"NSCA: Gymnastic core — highest activation of rectus abdominis"}];
+
+  // NSCA Lower Body (Basketball Specific)
+  const lowerEx = squats < 10
+    ? [{n:"Assisted Squat (hold support)",s:"3",r:"10",note:"NSCA: Learn movement pattern before adding load. Knees track over toes."},
+       {n:"Wall Sit",s:"3",r:"20 sec",note:"NSCA Isometric: Builds quad strength without movement skill requirement"}]
+    : squats < 20
+    ? [{n:"Bodyweight Squat",s:"3",r:`${squats}`,note:`NSCA: Start at your max (${squats}), add 2 reps each session`},
+       {n:"Split Squat",s:"3",r:"8 each",note:"NSCA: Unilateral training — addresses imbalances, more specific to basketball"}]
+    : [{n:"Jump Squat",s:"4",r:"8",note:"NSCA Power Protocol: 75-85% effort. 2-3 min rest between sets for full power recovery."},
+       {n:"Bulgarian Split Squat",s:"3",r:"10 each",note:"NSCA: Unilateral power — most sport-specific lower body exercise"},
+       {n:"Broad Jump",s:"3",r:"6",note:"NSCA Plyometric: Ground contact under 250ms. Reactive strength index."}];
+
+  // FIBA/NBA Basketball Skill Development
+  // Based on FIBA Skill Pillars: 1-Footwork 2-Ball Handling 3-Shooting 4-Finishing 5-Decision Making
+  const bbSkills_beginner = [
+    {n:"FIBA Stance & Footwork",s:"3",r:"5 min",note:"FIBA Foundation: Athletic stance → pivot foot → jab step. Footwork is the base of all basketball skills."},
+    {n:"Stationary Ball Handling — Right",s:"3",r:"60 sec",note:"NBA Development: Eyes up, finger pads not palm. Low dribble = control."},
+    {n:"Stationary Ball Handling — Left",s:"3",r:"60 sec",note:"NBA: Weak hand development. 70% of practice time on weak hand for beginners."},
+    {n:"Mikan Drill (walking)",s:"3",r:"10 each side",note:"FIBA Finishing Foundation: Alternate hands, off glass. No jump needed at first."}
+  ];
+
+  const bbSkills_intermediate = [
+    {n:"FIBA Ball Handling Circuit",s:"4",r:"2 min",note:"FIBA: Crossover → between legs → behind back → spin. Game speed."},
+    {n:"NBA 3-Cone Shooting",s:"4",r:"5 shots each",note:"NBA Development: Catch-shoot from 3 spots. BEEF — Balance Eyes Elbow Follow-through."},
+    {n:"Mikan Drill (full speed)",s:"3",r:"20 makes",note:"FIBA: Alternating layups at game speed. Both hands equally."},
+    {n:"1v0 Attack Closeout",s:"3",r:"10 each",note:"FIBA Constraint Drill: Attack imaginary closeout with one move. Develops decision pattern."}
+  ];
+
+  const bbSkills_advanced = [
+    {n:"NBA Guard Skill Workout",s:"5",r:"2 min each",note:"NBA: Full combo — cross, BTL, BtB, hesitation, spin. Game speed only."},
+    {n:"FIBA Shooting — Off Movement",s:"4",r:"10 shots",note:"FIBA: Catch off screen, off dribble pull up, step back. Shooting under game conditions."},
+    {n:"Constraint Drill — 1v1 Rules",s:"4",r:"5 min",note:"FIBA Constraints-Led: Play 1v1 with specific rule (only left hand, only 1 dribble). Forces decision making."},
+    {n:"NBA Film + Execution",s:"1",r:"10 min",note:"NBA Development: Watch one move on YouTube, immediately practice it 20x. Connects cognitive and physical."}
+  ];
+
+  const bbDrills = level==='advanced' || dribbling>=3 ? bbSkills_advanced
+    : level==='intermediate' || dribbling>=2 ? bbSkills_intermediate
+    : bbSkills_beginner;
+
+  // FIBA Shooting Progression
+  const shootDrills = shooting <= 1
+    ? [{n:"FIBA Form Shooting — 1 Step",s:"3",r:"20 makes",note:"FIBA: One step from basket. One hand only. Groove the release before adding distance."}]
+    : shooting <= 2
+    ? [{n:"FIBA Spot Shooting — 5 Spots",s:"2",r:"5 shots each",note:"FIBA: Both sides, top of key, corners. Same footwork every shot."}]
+    : [{n:"FIBA Pull-Up Jumper",s:"3",r:"10 each side",note:"FIBA Advanced: 2 dribble pull up. Same release as spot shot."}];
+
+  return [
+    {
+      day:"Monday", focus:"NSCA Push + Core", color:"#E06B1A",
+      protocol:"NSCA Upper Body A — Horizontal Push + Core Stability",
+      exercises:[
+        {n:"RAMP Warmup",s:"-",r:"8 min",note:"NSCA Protocol: Raise (jog) → Activate (arm circles, leg swings) → Mobilise (hip circles) → Potentiate (5 jump squats)"},
+        ...pushEx,
+        ...coreEx,
+        {n:"Leg Raises",s:"3",r:plank<15?"8":"15",note:"NSCA: Hip flexor strength — critical for jumping and sprinting"}
+      ]
+    },
+    {
+      day:"Tuesday", focus:"FIBA Ball Handling + NBA Shooting", color:"#3B82F6",
+      protocol:"FIBA Skill Pillars: Ball Handling → Shooting → Finishing",
+      exercises:[
+        {n:"FIBA Dynamic Warmup",s:"-",r:"8 min",note:"FIBA Standard: Hip flexors, ankle mobility, defensive slide activation"},
+        ...bbDrills,
+        ...shootDrills,
+        {n:"FIBA Defensive Footwork",s:"3",r:"30 sec",note:"FIBA: Defensive stance → slide → closeout. Never cross feet."}
+      ]
+    },
+    {
+      day:"Wednesday", focus:"NSCA Pull + Mobility", color:"#8B5CF6",
+      protocol:"NSCA Upper Body B — Horizontal & Vertical Pull + Flexibility",
+      exercises:[
+        {n:"RAMP Warmup",s:"-",r:"8 min",note:"NSCA: Shoulder specific — band pull aparts, wall slides, thoracic rotations"},
+        ...pullEx,
+        {n:"Superman Hold",s:"3",r:"15",note:"NSCA: Posterior chain activation — erectors, glutes, hamstrings"},
+        {n:"INFS Recovery Stretch",s:"-",r:"10 min",note:"INFS: Post session static stretch held 30-45 sec reduces DOMS (Delayed Onset Muscle Soreness)"}
+      ]
+    },
+    {
+      day:"Thursday", focus:"FIBA Decision Making + NSCA Agility", color:"#10B981",
+      protocol:"NBA Player Development: Perceptual-Cognitive Training + Athletic Agility",
+      exercises:[
+        {n:"FIBA Dynamic Warmup",s:"-",r:"8 min",note:"FIBA: Basketball specific — defensive slides, backward run, change of direction"},
+        {n:"NBA Reaction Drill",s:"4",r:"30 sec",note:"NBA Development: Coach calls L/R/forward/stop. Player reacts immediately. Trains decision speed."},
+        {n:"FIBA 3-Cone Agility",s:"5",r:"30 sec",note:"FIBA Athletic Standard: T-drill, L-drill. Sub 10 sec T-drill = good basketball athlete."},
+        ...shootDrills,
+        {n:"NBA Constraint Game — 1 Dribble Only",s:"3",r:"5 min",note:"NBA Constraints-Led: 1 dribble max forces immediate decision making. Develops court vision."}
+      ]
+    },
+    {
+      day:"Friday", focus:"NSCA Lower Body + Power", color:"#EF4444",
+      protocol:`NSCA Lower Body + Plyometrics — ${goal==="Gain Muscle"?"Hypertrophy":"Power"} Focus`,
+      exercises:[
+        {n:"NSCA Lower Body Warmup",s:"-",r:"8 min",note:"NSCA: Glute activation (bridges), ankle mobility, single leg balance — before all lower body sessions"},
+        ...lowerEx,
+        {n:"Calf Raises",s:"4",r:"20",note:"NSCA: Gastrocnemius + soleus. Essential for jumping. Slow down phase (3 sec) = more effective."},
+        {n:"NSCA Plyometric Cooldown",s:"-",r:"5 min",note:`NSCA Recovery: Static stretch hip flexors, quads, hamstrings. Hold ${goal==="Lose Fat"?"30":"45"} sec each.`}
+      ]
+    },
+    {
+      day:"Saturday", focus:"FIBA Game Application", color:"#F59E0B",
+      protocol:"FIBA: Apply all week's skills in game context — the real measure of development",
+      exercises:[
+        {n:"FIBA Full Warmup Protocol",s:"-",r:"10 min",note:"FIBA Official: Dynamic + shooting warmup before all game situations"},
+        {n:"NBA Individual Workout",s:"-",r:"20 min",note:"NBA: Work on YOUR specific weakness from this week. Not general — specific one skill."},
+        {n:"FIBA 3v3 or Full Game",s:"-",r:"40 min",note:"FIBA: Game is the ultimate teacher. Coach observes, minimises interruption. Let them play."},
+        {n:"Weekly Progress Test",s:"-",r:"5 min",note:"NSCA Testing: Note max push ups, sprint time, or rim reach. Track weekly improvement."}
+      ]
+    },
+    {
+      day:"Sunday", focus:"INFS Active Recovery", color:"#6B7280",
+      protocol:"INFS & NSCA Recovery Protocol — Adaptation happens during rest, not training",
+      exercises:[
+        {n:"Light Walk 20-30 min",s:"1",r:"-",note:"INFS: Active recovery increases blood flow, removes lactic acid without adding fatigue"},
+        {n:"NSCA Flexibility Protocol",s:"-",r:"20 min",note:"NSCA: Hold each stretch 30-60 sec. Priority — hip flexors, hamstrings, calves, shoulders"},
+        {n:"INFS Sleep Optimisation",s:"-",r:"8 hrs tonight",note:"INFS: Sleep is when GH (Growth Hormone) is released — 70% of muscle recovery happens during sleep. Non-negotiable."},
+        {n:"NBA Mental Preparation",s:"-",r:"10 min",note:"NBA: Visualisation — see yourself executing skills perfectly. Used by every elite player."}
+      ]
+    },
+  ];
+}
+
+// ═══════════════════════════════════════
+// SCREEN NAVIGATION
+// ═══════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('nav-'+name)?.classList.add('active');
+  if(name==='clients') renderClients();
+  if(name==='business') renderBusiness();
+  if(name==='drills') renderDrills();
+}
+
+// ═══════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════
+function openModal(id) {
+  if(id==='modal-add-skill') buildSkillSliders();
+  const modal = document.getElementById(id);
+  modal.classList.add('open');
+  // Close when clicking background
+  modal.onclick = function(e) { if(e.target === modal) closeModal(id); };
+}
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  modal.classList.remove('open');
+  modal.onclick = null;
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ═══════════════════════════════════════
+// CLIENT FUNCTIONS
+// ═══════════════════════════════════════
+function addClient() {
+  try {
+    const name = document.getElementById('f-name').value.trim();
+    if(!name) { showToast('Please enter athlete name'); return; }
+
+    const age = document.getElementById('f-age').value || '16';
+    const gender = document.getElementById('f-gender').value || 'Male';
+    const height = document.getElementById('f-height').value || '170';
+    const weight = document.getElementById('f-weight').value || '70';
+    const goal = document.getElementById('f-goal').value || 'Lose Fat';
+    const diet = document.getElementById('f-diet').value || 'Both (Veg + Non-Veg)';
+    const activity = document.getElementById('f-activity').value || 'Moderately Active';
+    const position = document.getElementById('f-position').value || 'Point Guard';
+    const notes = document.getElementById('f-notes').value || '';
+    const waist = document.getElementById('f-waist').value || '';
+    const chest = document.getElementById('f-chest').value || '';
+
+    const assessment = {
+      pushups: document.getElementById('f-pushups').value || '0',
+      pullups: document.getElementById('f-pullups').value || '0',
+      plank: document.getElementById('f-plank').value || '0',
+      squats: document.getElementById('f-squats').value || '0',
+      sprint: document.getElementById('f-sprint').value || '0',
+      dribbling: document.getElementById('f-dribbling').value || '0',
+      shooting: document.getElementById('f-shooting').value || '0',
+      level: document.getElementById('f-level').value || 'beginner',
+    };
+
+    const workout = buildWorkout(goal, assessment);
+
+    const newClient = {
+      id: Date.now(),
+      name, age, gender, height, weight,
+      waist, chest, goal, diet, activity,
+      position, notes, assessment,
+      createdAt: new Date().toLocaleDateString('en-IN'),
+      workout,
+      progress:[], skills:[], sessions:[], payments:[]
+    };
+
+    if(!state.clients) state.clients = [];
+    state.clients.push(newClient);
+    save();
+    closeModal('modal-add-client');
+    ['f-name','f-age','f-height','f-weight','f-waist','f-chest','f-notes',
+     'f-pushups','f-pullups','f-plank','f-squats','f-sprint'
+    ].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    renderClients();
+    showToast('✓ ' + name + ' registered!');
+  } catch(err) {
+    showToast('Error: ' + err.message);
+    console.error('addClient error:', err);
+  }
+}
+
+function renderClients() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = state.clients.filter(c=>c.name.toLowerCase().includes(q)||(c.notes||'').toLowerCase().includes(q));
+  const el = document.getElementById('client-list');
+  if(filtered.length===0) { el.innerHTML='<div style="text-align:center;padding:40px;color:#8a7a72;">No athletes yet. Add your first client above.</div>'; return; }
+  el.innerHTML = filtered.map(c=>{
+    const paid = (c.payments||[]).filter(p=>p.status==='Paid').reduce((s,p)=>s+(+p.amount),0);
+    const pending = (c.payments||[]).filter(p=>p.status==='Pending').reduce((s,p)=>s+(+p.amount),0);
+    return `<div class="card" style="padding:16px;margin-bottom:12px;cursor:pointer;" onclick="openProfile(${c.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="width:44px;height:44px;background:#131313;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #E06B1A;flex-shrink:0;">
+            <span class="material-symbols-outlined" style="color:#E06B1A;font-size:20px;">person</span>
+          </div>
+          <div>
+            <div class="font-headline" style="font-size:15px;font-weight:700;">${c.name}</div>
+            <div style="font-size:11px;color:#8a7a72;">${c.position} · ${c.weight}kg</div>
+          </div>
+        </div>
+        <span class="${pending>0?'badge-pending':'badge-paid'}">${pending>0?'PENDING':'PAID'}</span>
+      </div>
+      <div style="font-size:10px;color:#8a7a72;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Primary Focus</div>
+      <div style="font-size:13px;font-weight:700;color:#E06B1A;">⚡ ${c.notes||c.goal}</div>
+    </div>`;
+  }).join('');
+}
+
+function openProfile(id) {
+  state.currentClientId = id;
+  const c = state.clients.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('profile-name').textContent = c.name.toUpperCase();
+  document.getElementById('profile-roster-id').textContent = `ACTIVE · ROSTER ID: #${String(id).slice(-4)}`;
+  document.getElementById('profile-position').textContent = c.position;
+  document.getElementById('profile-height').textContent = c.height ? c.height+'cm' : '—';
+  document.getElementById('profile-weight').textContent = c.weight ? c.weight+'kg' : '—';
+  document.getElementById('profile-goal').textContent = c.goal;
+  const n = buildNutrition(c);
+  document.getElementById('p-cal').textContent = n.cal;
+  document.getElementById('p-protein').textContent = n.protein+'g';
+  document.getElementById('p-carbs').textContent = n.carbs+'g';
+  document.getElementById('p-fats').textContent = n.fats+'g';
+  document.getElementById('meal-plan-container').innerHTML =
+    `<div style="background:rgba(16,185,129,0.08);border:1px solid #10B98133;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+      <div style="font-size:10px;color:#10B981;font-weight:700;letter-spacing:0.08em;margin-bottom:4px;">📊 INFS NUTRITION PROTOCOL</div>
+      <div style="font-size:11px;color:#9ca3af;">${n.infsNote}</div>
+      <div style="font-size:11px;color:#3B82F6;margin-top:4px;">💧 Daily Water Target: ${n.water} litres (INFS: 40ml per kg bodyweight)</div>
+    </div>` +
+    n.meals.map(m=>`
+    <div class="card" style="padding:14px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-weight:700;font-size:14px;">${m.meal}</div>
+        <div style="display:flex;gap:8px;">
+          <span style="font-size:11px;color:#8a7a72;">${m.time}</span>
+          <span style="font-size:11px;color:#E06B1A;background:rgba(224,107,26,0.15);padding:2px 8px;border-radius:4px;font-weight:700;">${m.cal} kcal</span>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#3B82F6;margin-bottom:6px;font-style:italic;">${m.protocol}</div>
+      ${m.foods.map(f=>`<div style="font-size:12px;color:#dec0b2;padding:2px 0;">• ${f}</div>`).join('')}
+      <div style="font-size:11px;color:#F59E0B;margin-top:8px;font-style:italic;">💡 ${m.tip}</div>
+    </div>`).join('');
+  const workout = c.workout || buildWorkout(c.goal, c.assessment);
+  document.getElementById('workout-container').innerHTML =
+    (c.assessment ? `<div style="background:#0f172a;border:1px solid #1f2937;border-radius:8px;padding:12px 16px;margin-bottom:12px;">
+      <div style="font-size:11px;color:#3B82F6;font-weight:700;margin-bottom:8px;">📊 ASSESSMENT — Plan Built From These Results</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        ${[['Push Ups',c.assessment.pushups],['Pull Ups',c.assessment.pullups],['Plank (s)',c.assessment.plank],['Squats',c.assessment.squats],['Level',c.assessment.level]].map(([l,v])=>`<div><div style="font-size:10px;color:#6b7280;">${l}</div><div style="font-size:14px;font-weight:700;color:#3B82F6;">${v||'0'}</div></div>`).join('')}
+      </div>
+    </div>` : '') +
+    workout.map((d,i)=>`
+    <div class="card" style="padding:14px;margin-bottom:10px;border-left:3px solid ${d.color||DAY_COLORS[i]};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-weight:700;color:${d.color||DAY_COLORS[i]};font-size:14px;">${d.day}</div>
+        <div style="font-size:11px;color:#8a7a72;background:#131313;padding:3px 10px;border-radius:10px;">${d.focus}</div>
+      </div>
+      ${d.protocol?`<div style="font-size:10px;color:#3B82F6;margin-bottom:8px;font-style:italic;">📋 ${d.protocol}</div>`:''}
+      ${d.exercises.map(e=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #353535;">
+        <div>
+          <div style="font-size:13px;">${e.n}</div>
+          ${e.note?`<div style="font-size:10px;color:#6b7280;margin-top:1px;">💡 ${e.note}</div>`:''}
+        </div>
+        <div style="font-size:11px;color:${d.color||DAY_COLORS[i]};font-weight:700;flex-shrink:0;margin-left:8px;">${e.s!=='-'?e.s+'×'+e.r:e.r}</div>
+      </div>`).join('')}
+    </div>`).join('');
+  renderSessions(c);
+  renderProgress(c);
+  renderSkills(c);
+  renderPayments(c);
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.client-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.tab-btn').classList.add('active');
+  document.getElementById('tab-nutrition').classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-profile').classList.add('active');
+}
+
+function switchClientTab(name,btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.client-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ═══════════════════════════════════════
+// SESSION
+// ═══════════════════════════════════════
+function setAttendance(val) {
+  state.sessionAttended = val;
+  document.getElementById('s-att-yes').style.background = val ? '#10B981' : '#353535';
+  document.getElementById('s-att-no').style.background = val ? '#353535' : '#EF4444';
+}
+function addSession() {
+  const c = state.clients.find(x=>x.id===state.currentClientId);
+  if(!c || !document.getElementById('s-date').value) { showToast('Please select a date'); return; }
+  if(!c.sessions) c.sessions=[];
+  c.sessions.push({ id:Date.now(), date:document.getElementById('s-date').value, attended:state.sessionAttended, focus:document.getElementById('s-focus').value, duration:document.getElementById('s-duration').value, notes:document.getElementById('s-notes').value });
+  save(); closeModal('modal-add-session'); renderSessions(c); showToast('✓ Session logged!');
+}
+function renderSessions(c) {
+  const sessions = c.sessions||[];
+  const attended = sessions.filter(s=>s.attended).length;
+  document.getElementById('sessions-container').innerHTML = sessions.length===0 ? '<div style="text-align:center;padding:30px;color:#8a7a72;">No sessions logged yet.</div>' :
+    [...sessions].reverse().map(s=>`<div class="card" style="padding:12px;margin-bottom:8px;border-left:3px solid ${s.attended?'#10B981':'#EF4444'};">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-weight:700;font-size:13px;">${s.date} <span style="font-size:11px;color:${s.attended?'#10B981':'#EF4444'};">(${s.attended?'✓ Attended':'✗ Missed'})</span></div>
+          ${s.focus?`<div style="font-size:12px;color:#3B82F6;margin-top:2px;">Focus: ${s.focus}</div>`:''}
+          ${s.notes?`<div style="font-size:11px;color:#8a7a72;margin-top:4px;">${s.notes}</div>`:''}
+        </div>
+        <div style="font-size:11px;color:#8a7a72;">${s.duration}min</div>
+      </div>
+    </div>`).join('')+`<div style="text-align:center;padding:10px;font-size:12px;color:#8a7a72;">${attended} sessions attended</div>`;
+}
+
+// ═══════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════
+function addProgress() {
+  const c = state.clients.find(x=>x.id===state.currentClientId);
+  if(!c || !document.getElementById('pr-date').value) { showToast('Please select a date'); return; }
+  if(!c.progress) c.progress=[];
+  c.progress.push({ id:Date.now(), date:document.getElementById('pr-date').value, weight:document.getElementById('pr-weight').value, waist:document.getElementById('pr-waist').value, chest:document.getElementById('pr-chest').value, arms:document.getElementById('pr-arms').value, sleep:document.getElementById('pr-sleep').value, water:document.getElementById('pr-water').value, notes:document.getElementById('pr-notes').value });
+  save(); closeModal('modal-add-progress'); renderProgress(c); showToast('✓ Progress saved!');
+}
+function renderProgress(c) {
+  const progress = c.progress||[];
+  let chart = '';
+  if(progress.filter(p=>p.weight).length>1) {
+    const weights = progress.filter(p=>p.weight).map(p=>+p.weight);
+    const min = Math.min(...weights)-2, max = Math.max(...weights)+2;
+    const diff = (weights[0]-weights[weights.length-1]).toFixed(1);
+    chart = `<div class="card" style="padding:14px;margin-bottom:12px;">
+      <div style="font-size:12px;color:#8B5CF6;font-weight:700;margin-bottom:10px;">Weight Trend</div>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:60px;">
+        ${progress.filter(p=>p.weight).map(e=>{const pct=((+e.weight-min)/(max-min))*100;return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:8px;color:#E06B1A;">${e.weight}</div><div style="width:100%;height:${pct}%;background:#E06B1A;border-radius:2px 2px 0 0;min-height:4px;"></div><div style="font-size:8px;color:#8a7a72;">${e.date.slice(5)}</div></div>`;}).join('')}
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:${+diff>0?'#10B981':'#EF4444'};">${+diff>0?`✅ Lost ${diff}kg total`:`📈 Gained ${Math.abs(diff)}kg total`}</div>
+    </div>`;
+  }
+  document.getElementById('progress-container').innerHTML = chart + (progress.length===0?'<div style="text-align:center;padding:30px;color:#8a7a72;">No progress entries yet.</div>':
+    [...progress].reverse().map(p=>`<div class="card" style="padding:12px;margin-bottom:8px;border-left:3px solid #8B5CF6;">
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px;">${p.date}</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        ${[['⚖️',p.weight,'kg'],['📏',p.waist,'cm'],['💪',p.chest,'cm'],['🦾',p.arms,'cm'],['😴',p.sleep,'hrs'],['💧',p.water,'L']].filter(([,v])=>v).map(([ic,v,u])=>`<div><div style="font-size:10px;color:#8a7a72;">${ic}</div><div style="font-size:14px;font-weight:700;">${v}${u}</div></div>`).join('')}
+      </div>
+      ${p.notes?`<div style="font-size:11px;color:#8a7a72;margin-top:6px;">${p.notes}</div>`:''}
+    </div>`).join(''));
+}
+
+// ═══════════════════════════════════════
+// SKILLS
+// ═══════════════════════════════════════
+function buildSkillSliders() {
+  document.getElementById('skill-sliders').innerHTML = SKILLS.map(s=>`
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:12px;color:#dec0b2;">${s}</span>
+        <span style="font-size:12px;color:#F59E0B;font-weight:700;" id="val-${s.replace(/[^a-z]/gi,'')}"}>0/10</span>
+      </div>
+      <input type="range" min="0" max="10" value="0" style="width:100%;accent-color:#F59E0B;" oninput="document.getElementById('val-${s.replace(/[^a-z]/gi,'')}').textContent=this.value+'/10'" data-skill="${s}"/>
+    </div>`).join('');
+}
+function addSkillRating() {
+  const c = state.clients.find(x=>x.id===state.currentClientId);
+  if(!c || !document.getElementById('sk-date').value) { showToast('Please select a date'); return; }
+  if(!c.skills) c.skills=[];
+  const ratings={};
+  document.querySelectorAll('#skill-sliders input[data-skill]').forEach(inp=>{ ratings[inp.dataset.skill]=+inp.value; });
+  c.skills.push({ id:Date.now(), date:document.getElementById('sk-date').value, ratings });
+  save(); closeModal('modal-add-skill'); renderSkills(c); showToast('✓ Skills rated!');
+}
+function renderSkills(c) {
+  const skills = c.skills||[];
+  document.getElementById('skills-container').innerHTML = skills.length===0 ? '<div style="text-align:center;padding:30px;color:#8a7a72;">No skill ratings yet.</div>' :
+    [...skills].reverse().map(r=>`<div class="card" style="padding:14px;margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:700;color:#F59E0B;margin-bottom:12px;">📅 ${r.date}</div>
+      ${SKILLS.map(sk=>`<div style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+          <span style="font-size:12px;color:#dec0b2;">${sk}</span>
+          <span style="font-size:12px;color:#F59E0B;font-weight:700;">${r.ratings[sk]||0}/10</span>
+        </div>
+        <div class="skill-bar"><div class="skill-fill" style="width:${(r.ratings[sk]||0)*10}%;"></div></div>
+      </div>`).join('')}
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// PAYMENTS
+// ═══════════════════════════════════════
+function addPayment() {
+  const c = state.clients.find(x=>x.id===state.currentClientId);
+  if(!c || !document.getElementById('pay-date').value || !document.getElementById('pay-amount').value) { showToast('Please fill date and amount'); return; }
+  if(!c.payments) c.payments=[];
+  c.payments.push({ id:Date.now(), date:document.getElementById('pay-date').value, amount:document.getElementById('pay-amount').value, type:document.getElementById('pay-type').value, status:document.getElementById('pay-status').value, notes:document.getElementById('pay-notes').value });
+  save(); closeModal('modal-add-payment'); renderPayments(c); renderBusiness(); showToast('✓ Payment saved!');
+}
+function renderPayments(c) {
+  const payments = c.payments||[];
+  const earned = payments.filter(p=>p.status==='Paid').reduce((s,p)=>s+(+p.amount),0);
+  const pending = payments.filter(p=>p.status==='Pending').reduce((s,p)=>s+(+p.amount),0);
+  document.getElementById('p-earned').textContent = '₹'+earned.toLocaleString();
+  document.getElementById('p-pending').textContent = '₹'+pending.toLocaleString();
+  document.getElementById('payments-container').innerHTML = payments.length===0 ? '<div style="text-align:center;padding:30px;color:#8a7a72;">No payments yet.</div>' :
+    [...payments].reverse().map(p=>`<div class="card" style="padding:12px;margin-bottom:8px;border-left:3px solid ${p.status==='Paid'?'#10B981':'#EF4444'};">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-weight:700;font-size:13px;">${p.date} · ${p.type}</div>
+          ${p.notes?`<div style="font-size:11px;color:#8a7a72;margin-top:2px;">${p.notes}</div>`:''}
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:18px;font-weight:800;color:${p.status==='Paid'?'#10B981':'#EF4444'};">₹${(+p.amount).toLocaleString()}</div>
+          <div style="font-size:10px;color:${p.status==='Paid'?'#10B981':'#EF4444'};">${p.status}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// BUSINESS
+// ═══════════════════════════════════════
+function renderBusiness() {
+  const allPayments = state.clients.flatMap(c=>(c.payments||[]).map(p=>({...p,clientName:c.name,position:c.position})));
+  const total = allPayments.reduce((s,p)=>s+(+p.amount),0);
+  const paid = allPayments.filter(p=>p.status==='Paid').reduce((s,p)=>s+(+p.amount),0);
+  const pending = allPayments.filter(p=>p.status==='Pending').reduce((s,p)=>s+(+p.amount),0);
+  document.getElementById('b-total').textContent = '₹'+total.toLocaleString();
+  document.getElementById('b-paid').textContent = '₹'+paid.toLocaleString();
+  document.getElementById('b-pending').textContent = '₹'+pending.toLocaleString();
+  document.getElementById('b-paid-bar').style.width = total>0?(paid/total*100)+'%':'0%';
+  document.getElementById('b-pending-bar').style.width = total>0?(pending/total*100)+'%':'0%';
+  document.getElementById('business-list').innerHTML = state.clients.length===0 ? '<div style="text-align:center;padding:30px;color:#8a7a72;">No clients yet.</div>' :
+    state.clients.map((c,i)=>{
+      const cpaid = (c.payments||[]).filter(p=>p.status==='Paid').reduce((s,p)=>s+(+p.amount),0);
+      const cpending = (c.payments||[]).filter(p=>p.status==='Pending').reduce((s,p)=>s+(+p.amount),0);
+      return `<div class="card" style="padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;">
+        <div style="width:36px;height:36px;background:#E06B1A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;">${String(i+1).padStart(2,'0')}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:14px;">${c.name}</div>
+          <div style="font-size:11px;color:#8a7a72;">${c.position}</div>
+        </div>
+        <div style="text-align:right;">
+          ${cpaid>0?`<div style="font-size:16px;font-weight:800;color:#10B981;">₹${cpaid.toLocaleString()}</div>`:''}
+          ${cpending>0?`<div style="font-size:12px;color:#EF4444;">₹${cpending.toLocaleString()} pending</div>`:''}
+          ${cpaid===0&&cpending===0?`<div style="font-size:12px;color:#8a7a72;">No payments</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════
+// DRILLS
+// ═══════════════════════════════════════
+function addDrill() {
+  const name = document.getElementById('d-name').value.trim();
+  if(!name) { showToast('Please enter drill name'); return; }
+  state.drills.push({ id:Date.now(), name, category:document.getElementById('d-category').value, duration:document.getElementById('d-duration').value, difficulty:document.getElementById('d-difficulty').value, desc:document.getElementById('d-desc').value });
+  save(); closeModal('modal-add-drill');
+  ['d-name','d-duration','d-desc'].forEach(id=>document.getElementById(id).value='');
+  renderDrills(); showToast('✓ Drill saved!');
+}
+function filterDrills(cat,btn) {
+  state.drillFilter = cat;
+  document.querySelectorAll('#screen-drills .btn-secondary').forEach(b=>{ b.style.background='#20201f'; b.style.color='#e5e2e1'; b.style.borderColor='#574237'; });
+  btn.style.background='#E06B1A'; btn.style.color='#fff'; btn.style.borderColor='#E06B1A';
+  renderDrills();
+}
+function renderDrills() {
+  const filtered = state.drillFilter==='all' ? state.drills : state.drills.filter(d=>d.category===state.drillFilter);
+  document.getElementById('drill-count').textContent = state.drills.length+' drills saved';
+  const diffColor = {Beginner:'#10B981',Intermediate:'#F59E0B',Advanced:'#EF4444'};
+  document.getElementById('drills-list').innerHTML = filtered.length===0 ? '<div style="text-align:center;padding:30px;color:#8a7a72;">No drills saved yet. Add your first drill.</div>' :
+    filtered.map(d=>`<div class="card" style="padding:14px;margin-bottom:10px;border-left:3px solid #3B82F6;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div style="font-weight:700;font-size:14px;">${d.name}</div>
+        <span style="font-size:10px;color:${diffColor[d.difficulty]||'#8a7a72'};background:rgba(0,0,0,0.3);padding:2px 8px;border-radius:4px;font-weight:700;flex-shrink:0;">${d.difficulty}</span>
+      </div>
+      <div style="font-size:11px;color:#8a7a72;margin-bottom:6px;">${d.category} · ${d.duration}</div>
+      ${d.desc?`<div style="font-size:12px;color:#dec0b2;line-height:1.5;">${d.desc}</div>`:''}
+    </div>`).join('');
+}
+
+// Init
+renderClients();
+renderBusiness();
+renderDrills();
+// Close any accidentally open modals on load
+document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+
+// PWA Service Worker
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+</script>
+<!-- Edit Nutrition Modal -->
+<div class="modal" id="modal-edit-nutrition">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#10B981;">EDIT NUTRITION PLAN</h2>
+      <button onclick="closeModal('modal-edit-nutrition')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <div style="font-size:12px;color:#9ca3af;margin-bottom:14px;">Edit the meal plan for this client. Each meal on a new line starting with the meal name followed by colon.</div>
+    <span class="label">Custom Nutrition Notes</span>
+    <textarea class="input-field" id="edit-nutrition-notes" rows="8" placeholder="e.g.&#10;Breakfast: Wall push ups instead of push ups&#10;Pre workout: 1 banana only&#10;Avoid: Fried food, sugar drinks&#10;Add: Extra protein after session"></textarea>
+    <span class="label" style="margin-top:12px;display:block;">Daily Calories Target</span>
+    <input class="input-field" type="number" id="edit-cal" placeholder="e.g. 2200" style="margin-bottom:10px;"/>
+    <span class="label">Protein Target (g)</span>
+    <input class="input-field" type="number" id="edit-protein" placeholder="e.g. 120" style="margin-bottom:10px;"/>
+    <button class="btn-primary" style="margin-top:8px;" onclick="saveNutritionEdit()">✓ SAVE NUTRITION NOTES</button>
+  </div>
+</div>
+
+<!-- Edit Workout Modal -->
+<div class="modal" id="modal-edit-workout">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#E06B1A;">EDIT WORKOUT PLAN</h2>
+      <button onclick="closeModal('modal-edit-workout')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <div style="font-size:12px;color:#9ca3af;margin-bottom:14px;">Modify exercises for this client based on their current level.</div>
+    <span class="label">Monday — Push + Core</span>
+    <textarea class="input-field" id="edit-monday" rows="3" style="margin-bottom:10px;" placeholder="e.g. Wall Push Ups 3x15, Incline Push Ups 3x10, Plank 3x30sec"></textarea>
+    <span class="label">Tuesday — Basketball Skills</span>
+    <textarea class="input-field" id="edit-tuesday" rows="3" style="margin-bottom:10px;" placeholder="e.g. Dribbling 3x2min, Shooting 2x20, Layups 3x10"></textarea>
+    <span class="label">Wednesday — Pull + Yoga</span>
+    <textarea class="input-field" id="edit-wednesday" rows="3" style="margin-bottom:10px;" placeholder="e.g. Assisted Pull Ups 3x5, Yoga 20min"></textarea>
+    <span class="label">Thursday — Basketball + Agility</span>
+    <textarea class="input-field" id="edit-thursday" rows="3" style="margin-bottom:10px;" placeholder="e.g. Cone drills 4x1min, Light jogging 10min"></textarea>
+    <span class="label">Friday — Legs + Conditioning</span>
+    <textarea class="input-field" id="edit-friday" rows="3" style="margin-bottom:10px;" placeholder="e.g. Bodyweight squats 3x15, Walking lunges 2x10, Wall sit 2x30sec"></textarea>
+    <span class="label">Saturday — Game + Skills</span>
+    <textarea class="input-field" id="edit-saturday" rows="3" style="margin-bottom:10px;" placeholder="e.g. Mini game 30min, Shooting practice 15min"></textarea>
+    <span class="label">Sunday — Recovery</span>
+    <textarea class="input-field" id="edit-sunday" rows="3" style="margin-bottom:10px;" placeholder="e.g. Light walk 20min, Stretching 15min"></textarea>
+    <button class="btn-primary" style="margin-top:8px;" onclick="saveWorkoutEdit()">✓ SAVE WORKOUT PLAN</button>
+  </div>
+</div>
+
+<script>
+function saveNutritionEdit() {
+  const c = state.clients.find(x => x.id === state.currentClientId);
+  if(!c) return;
+  c.customNutritionNotes = document.getElementById('edit-nutrition-notes').value;
+  const cal = document.getElementById('edit-cal').value;
+  const protein = document.getElementById('edit-protein').value;
+  if(cal) c.customCal = cal;
+  if(protein) c.customProtein = protein;
+  save();
+  closeModal('modal-edit-nutrition');
+  openProfile(c.id);
+  showToast('✓ Nutrition plan updated!');
+}
+
+function saveWorkoutEdit() {
+  const c = state.clients.find(x => x.id === state.currentClientId);
+  if(!c) return;
+  c.customWorkout = {
+    monday: document.getElementById('edit-monday').value,
+    tuesday: document.getElementById('edit-tuesday').value,
+    wednesday: document.getElementById('edit-wednesday').value,
+    thursday: document.getElementById('edit-thursday').value,
+    friday: document.getElementById('edit-friday').value,
+    saturday: document.getElementById('edit-saturday').value,
+    sunday: document.getElementById('edit-sunday').value,
+  };
+  save();
+  closeModal('modal-edit-workout');
+  renderCustomWorkout(c);
+  showToast('✓ Workout plan updated!');
+}
+
+function renderCustomWorkout(c) {
+  if(!c.customWorkout) return;
+  const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  const labels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const colors = ['#E06B1A','#3B82F6','#8B5CF6','#10B981','#EF4444','#F59E0B','#6B7280'];
+  const focuses = ['Push + Core','Basketball Skills','Pull + Yoga','Basketball + Agility','Legs + Conditioning','Game + Skills','Recovery'];
+  const customHTML = days.map((d,i) => {
+    const content = c.customWorkout[d];
+    if(!content) return '';
+    return `<div class="card" style="padding:14px;margin-bottom:10px;border-left:3px solid ${colors[i]};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-weight:700;color:${colors[i]};font-size:14px;">${labels[i]}</div>
+        <div style="font-size:11px;color:#8a7a72;background:#131313;padding:3px 10px;border-radius:10px;">${focuses[i]}</div>
+      </div>
+      <div style="font-size:13px;color:#9ca3af;white-space:pre-wrap;line-height:1.6;">${content}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('workout-container').innerHTML = `<div style="background:rgba(224,107,26,0.1);border:1px solid #E06B1A33;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#E06B1A;">✏️ Custom workout plan active</div>` + customHTML;
+}
+
+const _originalOpenProfile = openProfile;
+openProfile = function(id) {
+  _originalOpenProfile(id);
+  const c = state.clients.find(x => x.id === id);
+  if(c && c.customWorkout) {
+    setTimeout(() => renderCustomWorkout(c), 100);
+  }
+  if(c && c.customNutritionNotes) {
+    setTimeout(() => {
+      const container = document.getElementById('meal-plan-container');
+      if(container) {
+        container.innerHTML += `<div style="background:rgba(16,185,129,0.1);border:1px solid #10B98133;border-radius:8px;padding:14px;margin-top:10px;">
+          <div style="font-size:12px;color:#10B981;font-weight:700;margin-bottom:8px;">📝 Coach's Custom Notes</div>
+          <div style="font-size:13px;color:#9ca3af;white-space:pre-wrap;line-height:1.6;">${c.customNutritionNotes}</div>
+          ${c.customCal ? `<div style="font-size:12px;color:#E06B1A;margin-top:8px;">Target: ${c.customCal} kcal · ${c.customProtein||'—'}g protein</div>` : ''}
+        </div>`;
+      }
+    }, 150);
+  }
+}
+</script>
+</body>
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 class="font-headline" style="font-size:18px;font-weight:800;color:#3B82F6;">EDIT ATHLETE INFO</h2>
+      <button onclick="closeModal('modal-edit-client')" style="background:#353535;border:none;color:#e5e2e1;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="grid-column:1/-1;"><span class="label">Full Name</span><input class="input-field" id="e-name" placeholder="e.g. Arjun Singh"/></div>
+      <div><span class="label">Age</span><input class="input-field" type="number" id="e-age" placeholder="16"/></div>
+      <div><span class="label">Gender</span><select class="input-field" id="e-gender"><option>Male</option><option>Female</option></select></div>
+      <div><span class="label">Height (cm)</span><input class="input-field" type="number" id="e-height" placeholder="172"/></div>
+      <div><span class="label">Weight (kg)</span><input class="input-field" type="number" id="e-weight" placeholder="65"/></div>
+      <div style="grid-column:1/-1;"><span class="label">Goal</span>
+        <select class="input-field" id="e-goal">
+          <option>Lose Fat</option><option>Gain Muscle</option><option>Maintain & Perform</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Diet Preference</span>
+        <select class="input-field" id="e-diet">
+          <option>Vegetarian</option><option>Non-Vegetarian</option><option>Both (Veg + Non-Veg)</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Activity Level</span>
+        <select class="input-field" id="e-activity">
+          <option>Sedentary</option><option>Lightly Active</option><option>Moderately Active</option><option>Very Active</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Position</span>
+        <select class="input-field" id="e-position">
+          <option>Point Guard</option><option>Shooting Guard</option><option>Small Forward</option><option>Power Forward</option><option>Centre</option><option>Not sure</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;"><span class="label">Primary Focus / Notes</span><textarea class="input-field" id="e-notes" rows="2"></textarea></div>
+    </div>
+    <button class="btn-primary" style="margin-top:16px;" onclick="saveEditClient()">✓ SAVE CHANGES</button>
+  </div>
+</div>
+
+<script>
+// Delete client
+function deleteClient() {
+  if(!confirm('Are you sure you want to delete this athlete? This cannot be undone.')) return;
+  state.clients = state.clients.filter(c => c.id !== state.currentClientId);
+  save();
+  showScreen('clients');
+  showToast('✓ Athlete deleted');
+}
+
+// Open edit modal with current data
+function openEditClient() {
+  const c = state.clients.find(x => x.id === state.currentClientId);
+  if(!c) return;
+  document.getElementById('e-name').value = c.name || '';
+  document.getElementById('e-age').value = c.age || '';
+  document.getElementById('e-gender').value = c.gender || 'Male';
+  document.getElementById('e-height').value = c.height || '';
+  document.getElementById('e-weight').value = c.weight || '';
+  document.getElementById('e-goal').value = c.goal || 'Lose Fat';
+  document.getElementById('e-diet').value = c.diet || 'Both (Veg + Non-Veg)';
+  document.getElementById('e-activity').value = c.activity || 'Moderately Active';
+  document.getElementById('e-position').value = c.position || 'Point Guard';
+  document.getElementById('e-notes').value = c.notes || '';
+  openModal('modal-edit-client');
+}
+
+// Save edited client
+function saveEditClient() {
+  const c = state.clients.find(x => x.id === state.currentClientId);
+  if(!c) return;
+  c.name = document.getElementById('e-name').value.trim() || c.name;
+  c.age = document.getElementById('e-age').value;
+  c.gender = document.getElementById('e-gender').value;
+  c.height = document.getElementById('e-height').value;
+  c.weight = document.getElementById('e-weight').value;
+  c.goal = document.getElementById('e-goal').value;
+  c.diet = document.getElementById('e-diet').value;
+  c.activity = document.getElementById('e-activity').value;
+  c.position = document.getElementById('e-position').value;
+  c.notes = document.getElementById('e-notes').value;
+  save();
+  closeModal('modal-edit-client');
+  openProfile(c.id);
+  showToast('✓ Info updated!');
+}
+</script>
+</body>
+</html>
